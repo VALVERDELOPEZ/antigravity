@@ -164,6 +164,8 @@
             border-radius: 10px;
             margin-bottom: 1rem;
             display: none;
+            font-size: 0.9em;
+            word-break: break-word;
         }
 
         .message.success {
@@ -238,12 +240,30 @@
         </p>
     </div>
 
+    <!-- Use a reliable CDNs and add error handling if it fails to load -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Initialize Supabase
+        // Check if supabase-js loaded
+        if (typeof supabase === 'undefined' || !window.supabase) {
+            document.getElementById('message').textContent = '⚠️ Error: Supabase library failed to load. Please check your ad blocker or internet connection.';
+            document.getElementById('message').className = 'message error';
+            document.getElementById('message').style.display = 'block';
+            console.error('Supabase library not loaded. Check CDN link.');
+        }
+
+        // Initialize Supabase Configuration
+        // CONFIRMED KEYS - DO NOT CHANGE WITHOUT VERIFICATION
         const supabaseUrl = 'https://ykxomhorciutqsahqges.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreG9taG9yY2l1dHFzYWhxZ2VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzMjc5MjAsImV4cCI6MjA4NTkwMzkyMH0.C1ZDWua0YuiSHS0l3b_L1qvLWJeibvGkSZOcdsQJHJA';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        let client = null;
+        try {
+            client = window.supabase.createClient(supabaseUrl, supabaseKey);
+            console.log('✅ Supabase Client Initialized');
+        } catch (e) {
+            console.error('❌ Failed to init Supabase:', e);
+            alert('System Error: Could not connect to authentication server.');
+        }
 
         const messageEl = document.getElementById('message');
         const magicLinkForm = document.getElementById('magicLinkForm');
@@ -253,6 +273,7 @@
         function showMessage(text, type) {
             messageEl.textContent = text;
             messageEl.className = `message ${type}`;
+            messageEl.style.display = 'block';
         }
 
         // Magic Link Sign In
@@ -260,23 +281,34 @@
             e.preventDefault();
             const email = document.getElementById('email').value;
 
+            if (!client) return;
+
             magicLinkBtn.classList.add('loading');
             magicLinkBtn.textContent = 'Sending...';
+            showMessage('', ''); // Clear previous
 
             try {
-                const { error } = await supabase.auth.signInWithOtp({
+                console.log('Attempting Magic Link for:', email);
+                const { data, error } = await client.auth.signInWithOtp({
                     email,
                     options: {
                         emailRedirectTo: `${window.location.origin}/auth/callback`
                     }
                 });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase Magic Link Error:', error);
+                    throw error;
+                }
 
-                showMessage('✅ Check your email for the magic link!', 'success');
+                console.log('Magic Link Success:', data);
+                showMessage('✅ Check your email! Magic link sent.', 'success');
                 magicLinkBtn.textContent = '📧 Email Sent!';
             } catch (error) {
-                showMessage(`❌ ${error.message}`, 'error');
+                console.error(error);
+                let msg = error.message;
+                if (msg.includes('rate limit')) msg = 'Too many requests. Please wait a minute.';
+                showMessage(`❌ ${msg}`, 'error');
                 magicLinkBtn.textContent = '✨ Send Magic Link';
             } finally {
                 magicLinkBtn.classList.remove('loading');
@@ -285,13 +317,20 @@
 
         // Google Sign In
         googleBtn.addEventListener('click', async () => {
+            if (!client) return;
+
             googleBtn.classList.add('loading');
+            showMessage('🔄 Connecting to Google...', 'success');
 
             try {
-                const { error } = await supabase.auth.signInWithOAuth({
+                // Ensure we use the current origin for redirect
+                const redirectUrl = `${window.location.origin}/auth/callback`;
+                console.log('Initiating Google OAuth to:', redirectUrl);
+
+                const { data, error } = await client.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: `${window.location.origin}/auth/callback`,
+                        redirectTo: redirectUrl,
                         queryParams: {
                             access_type: 'offline',
                             prompt: 'consent'
@@ -300,20 +339,31 @@
                 });
 
                 if (error) throw error;
+                // If successful, the page will redirect automatically
+
             } catch (error) {
                 console.error('Google Login Error:', error);
-                showMessage(`❌ Login Failed: ${error.message} (Check Supabase URL Config)`, 'error');
-                alert(`Login Failed: ${error.message}\n\nTip: Did you add "${window.location.origin}" to Supabase Redirect URLs?`);
+                showMessage(`❌ Google Login Failed: ${error.message}`, 'error');
+
+                // Detailed alert for common config issues
+                if (error.message.includes('redirect_uri_mismatch') || error.message.includes('not authorized')) {
+                    alert(`Setup Error: Google Cloud Configuration Mismatch.\n\nPlease ensure your Google Cloud Authorized Redirect URI is NOT: ${window.location.origin}/...\n\nIt MUST be your Supabase URL: ${supabaseUrl}/auth/v1/callback`);
+                } else {
+                    alert(`Login Failed: ${error.message}`);
+                }
                 googleBtn.classList.remove('loading');
             }
         });
 
         // Check if already logged in
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session) {
-                window.location.href = '/';
-            }
-        });
+        if (client) {
+            client.auth.getSession().then(({ data: { session } }) => {
+                if (session) {
+                    console.log('User already logged in, redirecting...');
+                    window.location.href = '/dashboard.html'; // Explicitly go to dashboard
+                }
+            });
+        }
     </script>
 </body>
 
