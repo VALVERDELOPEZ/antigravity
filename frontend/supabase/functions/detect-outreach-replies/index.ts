@@ -11,6 +11,7 @@ import {
     withRetry,
     getEmailMessage,
     getHeader,
+    extractEmailBody,
 } from '../scan-invoices/gmail-query.ts';
 
 // =============================================================================
@@ -99,7 +100,8 @@ serve(async (req) => {
                             .update({
                                 status: 'responded',
                                 email_replied: true,
-                                email_replied_at: new Date().toISOString()
+                                email_replied_at: new Date().toISOString(),
+                                last_reply_body: extractEmailBody(message)
                             })
                             .eq('id', matchingLead.id);
 

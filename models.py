@@ -123,6 +123,7 @@ class Lead(db.Model):
     email_opened_at = db.Column(db.DateTime)
     email_replied = db.Column(db.Boolean, default=False)
     email_replied_at = db.Column(db.DateTime)
+    last_reply_body = db.Column(db.Text)
     
     # Email Tracking (PRO)
     email_tracking_id = db.Column(db.String(50))

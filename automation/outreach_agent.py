@@ -83,28 +83,72 @@ Return JSON:
             logger.error(f"Error generating content for lead {lead.id}: {e}")
             return None, None
 
+    def generate_closing_content(self, lead, user):
+        """
+        Uses AI to detect intent and generate a closing email with a payment link.
+        """
+        if not self.qualifier:
+            return None, None
+
+        stripe_url = os.getenv('PRODUCT_PAYMENT_URL', 'https://buy.stripe.com/test_eVaeXkd8j7SgeYwdQQ')
+        
+        prompt = f"""The following lead has responded to our outreach. Analyze the response and write a follow-up to CLOSE THE SALE.
+        
+        Lead Response: {lead.last_reply_body}
+        Context: They are interested in Ghost License Reaper.
+        Goal: Get them to pay $299 for the setup and first month via this link: {stripe_url}
+        
+        Rules:
+        1. If they have questions, answer them based on: 'Ghost License Reaper scans Gmail, finds unused licenses, saves 20%+, works in 5 mins'.
+        2. Be extremely professional and confident.
+        3. Include the payment link clearly.
+        4. Keep it very short.
+        
+        Return JSON:
+        {{
+            "intent": "positive/neutral/negative",
+            "subject": "Re: {lead.email_subject}",
+            "body": "The closing email body"
+        }}"""
+
+        try:
+            response_text = self.qualifier._call_openai([
+                {"role": "system", "content": "You are a Senior Account Executive. Your goal is to close the deal. You response ONLY with JSON."},
+                {"role": "user", "content": prompt}
+            ])
+            
+            import json
+            if "```json" in response_text:
+                response_text = response_text.split("```json")[1].split("```")[0].strip()
+            
+            content = json.loads(response_text)
+            if content.get('intent') == 'positive':
+                return content.get('subject'), content.get('body')
+            return None, None
+        except Exception as e:
+            logger.error(f"Error generating closing for lead {lead.id}: {e}")
+            return None, None
+
     def process_outreach_cycle(self, limit=5):
         """
-        Finds 'new' leads with high scores and sends them an automated email.
+        Runs both the initial outreach and the auto-closing phase.
         """
+        sent_outreach = self._run_initial_outreach(limit)
+        sent_closing = self._run_auto_closing(limit)
+        return sent_outreach + sent_closing
+
+    def _run_initial_outreach(self, limit):
         with self.app_context:
-            # 1. Fetch leads that are "new" and have high scores
             leads = Lead.query.filter(
                 Lead.status == 'new',
                 Lead.score >= 9,
-                Lead.email.isnot(None) # Only if we have an email (manual or enriched)
+                Lead.email.isnot(None)
             ).limit(limit).all()
-
-            if not leads:
-                logger.info("No high-quality leads with emails ready for outreach.")
-                return 0
 
             emails_sent = 0
             for lead in leads:
                 user = User.query.get(lead.user_id)
                 if not user: continue
-
-                # Get SMTP config
                 smtp_config = UserSMTPConfig.query.filter_by(user_id=user.id).first()
                 config_dict = None
                 if smtp_config:
@@ -116,31 +160,58 @@ Return JSON:
                             'password': smtp_config.get_password(),
                             'sender_name': smtp_config.sender_name
                         }
-                    except Exception as e:
-                        logger.error(f"Error decrypting SMTP password for user {user.id}: {e}")
+                    except: pass
 
-                # 2. Generate Content
                 subject, body = self.generate_personalized_content(lead, user)
+                if not subject or not body: continue
+
+                success, _ = send_smtp_email(lead.email, subject, body, config=config_dict)
+                if success:
+                    lead.email_subject = subject
+                    lead.status = 'contacted'
+                    lead.email_sent_at = datetime.utcnow()
+                    emails_sent += 1
+            
+            db.session.commit()
+            return emails_sent
+
+    def _run_auto_closing(self, limit):
+        """
+        Finds leads that responded positively and sends the payment link.
+        """
+        with self.app_context:
+            # Note: 'responded' status is set by the Supabase Edge Function detect-outreach-replies
+            leads = Lead.query.filter(
+                Lead.status == 'responded',
+                Lead.email.isnot(None)
+            ).limit(limit).all()
+
+            emails_sent = 0
+            for lead in leads:
+                user = User.query.get(lead.user_id)
+                if not user: continue
+                smtp_config = UserSMTPConfig.query.filter_by(user_id=user.id).first()
+                config_dict = None
+                if smtp_config:
+                    try:
+                        config_dict = {
+                            'server': smtp_config.smtp_server, 'port': smtp_config.smtp_port,
+                            'username': smtp_config.smtp_username, 'password': smtp_config.get_password(),
+                            'sender_name': smtp_config.sender_name
+                        }
+                    except: pass
+
+                subject, body = self.generate_closing_content(lead, user)
                 if not subject or not body:
-                    logger.warning(f"Could not generate content for lead {lead.id}. Skipping.")
+                    # If not positive or error, we might want to manually review
                     continue
 
-                # 3. Send Email
-                success, msg = send_smtp_email(lead.email, subject, body, config=config_dict)
-                
+                success, _ = send_smtp_email(lead.email, subject, body, config=config_dict)
                 if success:
-                    # 4. Update Lead Status
-                    lead.email_subject = subject
-                    lead.email_generated = body
-                    lead.email_sent = True
-                    lead.email_sent_at = datetime.utcnow()
-                    lead.status = 'contacted'
-                    
-                    user.emails_sent_count += 1
+                    lead.status = 'closing' # Waiting for payment
+                    lead.email_replied = True # Ensure this is marked
                     emails_sent += 1
-                    logger.info(f"✓ Outreach successful for @{lead.username} ({lead.email})")
-                else:
-                    logger.error(f"✗ Outreach failed for @{lead.username}: {msg}")
+                    logger.info(f"💰 Closing link sent to interested lead: {lead.email}")
 
             db.session.commit()
             return emails_sent
