@@ -291,13 +291,19 @@
                 const { error } = await supabase.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
-                        redirectTo: `${window.location.origin}/auth/callback`
+                        redirectTo: `${window.location.origin}/auth/callback`,
+                        queryParams: {
+                            access_type: 'offline',
+                            prompt: 'consent'
+                        }
                     }
                 });
 
                 if (error) throw error;
             } catch (error) {
-                showMessage(`❌ ${error.message}`, 'error');
+                console.error('Google Login Error:', error);
+                showMessage(`❌ Login Failed: ${error.message} (Check Supabase URL Config)`, 'error');
+                alert(`Login Failed: ${error.message}\n\nTip: Did you add "${window.location.origin}" to Supabase Redirect URLs?`);
                 googleBtn.classList.remove('loading');
             }
         });
