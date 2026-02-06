@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Login | Ghost License Reaper</title>
+    <style>
+        :root {
+            font-family: 'Inter', system-ui, sans-serif;
+            --accent-cyan: #00E5FF;
+            --accent-purple: #8B5CF6;
+            --bg-dark: #090909;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --color-success: #4ADE80;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: radial-gradient(ellipse at top, #0f0f1a, var(--bg-dark) 70%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-container {
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-glass);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6);
+        }
+
+        .btn-google {
+            background: #fff;
+            color: #333;
+            margin-top: 1rem;
+        }
+
+        .btn-google:hover {
+            transform: translateY(-2px);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .message {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--color-success);
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(255, 107, 107, 0.15);
+            color: #FF6B6B;
+            display: block;
+        }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .footer-text a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="logo">👻</div>
+        <h1>Welcome Back</h1>
+        <p class="subtitle">Sign in to Ghost License Reaper</p>
+
+        <div class="card">
+            <div id="message" class="message"></div>
+
+            <form id="magicLinkForm">
+                <div class="form-group">
+                    <label>Work Email</label>
+                    <input type="email" id="email" placeholder="you@company.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary" id="magicLinkBtn">
+                    ✨ Send Magic Link
+                </button>
+            </form>
+
+            <div class="divider"><span>or continue with</span></div>
+
+            <button class="btn btn-google" id="googleBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="#4285F4"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="#FBBC05"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                    <path fill="#EA4335"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+                Continue with Google
+            </button>
+        </div>
+
+        <p class="footer-text">
+            Don't have an account? <a href="#">Start free trial</a>
+        </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://ykxomhorciutqsahqges.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreG9taG9yY2l1dHFzYWhxZ2VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzMjc5MjAsImV4cCI6MjA4NTkwMzkyMH0.C1ZDWua0YuiSHS0l3b_L1qvLWJeibvGkSZOcdsQJHJA';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        const messageEl = document.getElementById('message');
+        const magicLinkForm = document.getElementById('magicLinkForm');
+        const magicLinkBtn = document.getElementById('magicLinkBtn');
+        const googleBtn = document.getElementById('googleBtn');
+
+        function showMessage(text, type) {
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+        }
+
+        // Magic Link Sign In
+        magicLinkForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+
+            magicLinkBtn.classList.add('loading');
+            magicLinkBtn.textContent = 'Sending...';
+
+            try {
+                const { error } = await supabase.auth.signInWithOtp({
+                    email,
+                    options: {
+                        emailRedirectTo: `${window.location.origin}/auth/callback`
+                    }
+                });
+
+                if (error) throw error;
+
+                showMessage('✅ Check your email for the magic link!', 'success');
+                magicLinkBtn.textContent = '📧 Email Sent!';
+            } catch (error) {
+                showMessage(`❌ ${error.message}`, 'error');
+                magicLinkBtn.textContent = '✨ Send Magic Link';
+            } finally {
+                magicLinkBtn.classList.remove('loading');
+            }
+        });
+
+        // Google Sign In
+        googleBtn.addEventListener('click', async () => {
+            googleBtn.classList.add('loading');
+
+            try {
+                const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: `${window.location.origin}/auth/callback`
+                    }
+                });
+
+                if (error) throw error;
+            } catch (error) {
+                showMessage(`❌ ${error.message}`, 'error');
+                googleBtn.classList.remove('loading');
+            }
+        });
+
+        // Check if already logged in
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,524 @@
+{% extends "base.html" %}
+
+{% block title %}Find 100 Qualified Leads in 15 Minutes{% endblock %}
+
+{% block body_class %}landing-page{% endblock %}
+
+{% block body %}
+<!-- Navigation -->
+<nav class="nav">
+    <div class="nav-container">
+        <a href="{{ url_for('public.landing') }}" class="nav-logo">
+            <i class="fas fa-bolt"></i>
+            <span>Lead Finder AI</span>
+        </a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#faq">FAQ</a>
+        </div>
+        <div class="nav-actions">
+            <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Log In</a>
+            <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Start Free</a>
+        </div>
+        <button class="nav-mobile-toggle" id="mobileMenuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-bg">
+        <div class="hero-gradient"></div>
+        <div class="hero-grid"></div>
+    </div>
+    <div class="hero-container">
+        <div class="hero-badge">
+            <i class="fas fa-rocket"></i>
+            <span>Trusted by 500+ Growth Teams</span>
+        </div>
+        <h1 class="hero-title">
+            Find <span class="gradient-text">100 Qualified Leads</span><br>
+            in Just 15 Minutes
+        </h1>
+        <p class="hero-subtitle">
+            Stop wasting hours manually scraping Reddit, Twitter, and LinkedIn.
+            Our AI finds and scores leads automatically, so you can focus on closing deals.
+        </p>
+        <div class="hero-cta">
+            <a href="{{ url_for('auth.signup') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-bolt"></i>
+                Start Free Trial
+            </a>
+            <a href="#demo" class="btn btn-outline btn-lg">
+                <i class="fas fa-play"></i>
+                Watch Demo
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="stat-number">10x</span>
+                <span class="stat-label">Faster than manual</span>
+            </div>
+            <div class="hero-stat">
+                <span class="stat-number">85%</span>
+                <span class="stat-label">Lead quality score</span>
+            </div>
+            <div class="hero-stat">
+                <span class="stat-number">24/7</span>
+                <span class="stat-label">Automated scraping</span>
+            </div>
+        </div>
+    </div>
+    <div class="hero-visual">
+        <div class="dashboard-preview">
+            <div class="preview-header">
+                <div class="preview-dots">
+                    <span></span><span></span><span></span>
+                </div>
+                <span class="preview-title">Lead Finder AI Dashboard</span>
+            </div>
+            <div class="preview-content">
+                <div class="preview-sidebar">
+                    <div class="preview-menu-item active"><i class="fas fa-home"></i></div>
+                    <div class="preview-menu-item"><i class="fas fa-users"></i></div>
+                    <div class="preview-menu-item"><i class="fas fa-chart-line"></i></div>
+                    <div class="preview-menu-item"><i class="fas fa-cog"></i></div>
+                </div>
+                <div class="preview-main">
+                    <div class="preview-cards">
+                        <div class="preview-card">
+                            <span class="card-label">New Leads</span>
+                            <span class="card-value">147</span>
+                        </div>
+                        <div class="preview-card">
+                            <span class="card-label">High Score</span>
+                            <span class="card-value">38</span>
+                        </div>
+                        <div class="preview-card">
+                            <span class="card-label">Emails Sent</span>
+                            <span class="card-value">89</span>
+                        </div>
+                    </div>
+                    <div class="preview-table">
+                        <div class="preview-row">
+                            <span class="row-platform reddit">Reddit</span>
+                            <span class="row-name">@startup_founder</span>
+                            <span class="row-score high">9.2</span>
+                        </div>
+                        <div class="preview-row">
+                            <span class="row-platform twitter">Twitter</span>
+                            <span class="row-name">@growth_hacker</span>
+                            <span class="row-score high">8.7</span>
+                        </div>
+                        <div class="preview-row">
+                            <span class="row-platform hn">HN</span>
+                            <span class="row-name">@indie_maker</span>
+                            <span class="row-score medium">7.5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Problem Section -->
+<section class="section problem-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">The Problem</span>
+            <h2>Manual Lead Generation is <span class="text-danger">Killing Your Growth</span></h2>
+        </div>
+        <div class="problem-grid">
+            <div class="problem-card">
+                <div class="problem-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>5+ Hours Daily</h3>
+                <p>Founders spend 5-10 hours weekly manually scraping leads from Reddit, Twitter, and LinkedIn.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">
+                    <i class="fas fa-trash"></i>
+                </div>
+                <h3>80% Junk Leads</h3>
+                <p>Most leads found manually are unqualified - wrong persona, no budget, or not ready to buy.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <h3>$300+/Month Tools</h3>
+                <p>Enterprise tools like Apollo and ZoomInfo cost $300+/month - overkill for most startups.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">
+                    <i class="fas fa-envelope-open"></i>
+                </div>
+                <h3>0.5% Response Rate</h3>
+                <p>Generic cold emails get ignored. Without personalization, your outreach falls flat.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section features-section" id="features">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Features</span>
+            <h2>Everything You Need to <span class="gradient-text">10x Your Pipeline</span></h2>
+            <p>Our AI-powered platform automates the entire lead generation process.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-spider"></i>
+                </div>
+                <h3>Multi-Platform Scraping</h3>
+                <p>Automatically scrape leads from Reddit, Twitter/X, Hacker News, LinkedIn, Discord, and Indie Hackers.
+                </p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> 6+ platforms supported</li>
+                    <li><i class="fas fa-check"></i> Custom keyword filters</li>
+                    <li><i class="fas fa-check"></i> Real-time monitoring</li>
+                </ul>
+            </div>
+            <div class="feature-card featured">
+                <div class="feature-badge">Most Popular</div>
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>AI Lead Scoring</h3>
+                <p>GPT-4 analyzes each lead's urgency, budget, and buying intent to give a 1-10 quality score.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Urgency detection</li>
+                    <li><i class="fas fa-check"></i> Budget estimation</li>
+                    <li><i class="fas fa-check"></i> Intent analysis</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3>Personalized Emails</h3>
+                <p>AI generates unique, personalized cold emails for each lead - not generic templates.</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check"></i> Context-aware writing</li>
+                    <li><i class="fas fa-check"></i> Pain point targeting</li>
+                    <li><i class="fas fa-check"></i> One-click send</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="section how-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">How It Works</span>
+            <h2>From Zero to <span class="gradient-text">100 Leads</span> in 3 Steps</h2>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>Set Your Keywords</h3>
+                <p>Tell us what problems your customers have. We'll search for people expressing those problems online.
+                </p>
+            </div>
+            <div class="step-connector">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>AI Finds & Scores</h3>
+                <p>Our AI scrapes 6+ platforms every 8 hours and scores each lead on urgency, budget, and fit.</p>
+            </div>
+            <div class="step-connector">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>Send & Convert</h3>
+                <p>Review top leads in your dashboard. Click to send AI-generated personalized emails.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section class="section pricing-section" id="pricing">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Pricing</span>
+            <h2>Simple, Transparent <span class="gradient-text">Pricing</span></h2>
+            <p>Start free. Upgrade when you're ready.</p>
+        </div>
+        <div class="pricing-grid">
+            <!-- Free Plan -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3>Free</h3>
+                    <div class="pricing-price">
+                        <span class="price-amount">€0</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <p>Perfect for testing</p>
+                </div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> 10 leads/month</li>
+                    <li><i class="fas fa-check"></i> Reddit scraping only</li>
+                    <li><i class="fas fa-check"></i> Basic AI scoring</li>
+                    <li><i class="fas fa-times"></i> No email sending</li>
+                    <li><i class="fas fa-times"></i> Manual refresh only</li>
+                </ul>
+                <a href="{{ url_for('auth.signup') }}?plan=free" class="btn btn-outline btn-block">Start Free</a>
+            </div>
+
+            <!-- Starter Plan -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3>Starter</h3>
+                    <div class="pricing-price">
+                        <span class="price-amount">€49</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <p>For solo founders</p>
+                </div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> 100 leads/month</li>
+                    <li><i class="fas fa-check"></i> Reddit, Twitter, HN</li>
+                    <li><i class="fas fa-check"></i> Advanced AI scoring</li>
+                    <li><i class="fas fa-check"></i> 50 emails/month</li>
+                    <li><i class="fas fa-check"></i> Auto-refresh every 8h</li>
+                </ul>
+                <a href="{{ url_for('auth.signup') }}?plan=starter" class="btn btn-primary btn-block">Start Trial</a>
+            </div>
+
+            <!-- Pro Plan -->
+            <div class="pricing-card featured">
+                <div class="pricing-badge">Most Popular</div>
+                <div class="pricing-header">
+                    <h3>Pro</h3>
+                    <div class="pricing-price">
+                        <span class="price-amount">€99</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <p>For growing teams</p>
+                </div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> 500 leads/month</li>
+                    <li><i class="fas fa-check"></i> All 6 platforms</li>
+                    <li><i class="fas fa-check"></i> GPT-4 AI scoring</li>
+                    <li><i class="fas fa-check"></i> 250 emails/month</li>
+                    <li><i class="fas fa-check"></i> Priority support</li>
+                    <li><i class="fas fa-check"></i> Custom keywords</li>
+                </ul>
+                <a href="{{ url_for('auth.signup') }}?plan=pro" class="btn btn-primary btn-block">Start Trial</a>
+            </div>
+
+            <!-- Enterprise -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <h3>Enterprise</h3>
+                    <div class="pricing-price">
+                        <span class="price-amount">Custom</span>
+                    </div>
+                    <p>For large teams</p>
+                </div>
+                <ul class="pricing-features">
+                    <li><i class="fas fa-check"></i> Unlimited leads</li>
+                    <li><i class="fas fa-check"></i> All platforms + custom</li>
+                    <li><i class="fas fa-check"></i> Dedicated AI model</li>
+                    <li><i class="fas fa-check"></i> Unlimited emails</li>
+                    <li><i class="fas fa-check"></i> Dedicated support</li>
+                    <li><i class="fas fa-check"></i> API access</li>
+                </ul>
+                <a href="mailto:enterprise@leadfinderai.com" class="btn btn-outline btn-block">Contact Sales</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section testimonials-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Testimonials</span>
+            <h2>Loved by <span class="gradient-text">Growth Teams</span></h2>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p>"I was spending 4 hours/day on lead gen. Now I get better leads in 15 minutes. This tool paid for
+                    itself in the first week."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">SM</div>
+                    <div class="author-info">
+                        <strong>Sarah M.</strong>
+                        <span>Founder, GrowthStack</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p>"The AI scoring is incredible. Every lead with 8+ score has been a qualified prospect. Our conversion
+                    rate doubled."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">JK</div>
+                    <div class="author-info">
+                        <strong>James K.</strong>
+                        <span>Head of Growth, TechFlow</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p>"Finally, a lead gen tool that doesn't cost $500/month. The personalized emails actually get
+                    responses. 12% reply rate!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">AL</div>
+                    <div class="author-info">
+                        <strong>Alex L.</strong>
+                        <span>CEO, IndieStartup</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="section faq-section" id="faq">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">FAQ</span>
+            <h2>Frequently Asked <span class="gradient-text">Questions</span></h2>
+        </div>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>How does the AI scoring work?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>Our AI analyzes each lead's post content for buying signals: urgency language ("need ASAP",
+                        "struggling"), budget mentions, specific problem descriptions, and request for recommendations.
+                        It assigns a 1-10 score based on likelihood to convert.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Which platforms do you scrape?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>We scrape Reddit (15+ subreddits), Twitter/X, Hacker News, Indie Hackers, LinkedIn (public
+                        posts), and Discord (with bot access). Pro plans get access to all platforms.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Are the emails really personalized?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>Yes! Each email is generated specifically for that lead, referencing their exact problem, the
+                        platform where they posted, and their username. No templates - pure AI personalization.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Can I cancel anytime?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>Absolutely. No contracts, no commitments. Cancel your subscription anytime from your dashboard.
+                        You'll keep access until the end of your billing period.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Is this legal/ethical?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="faq-answer">
+                    <p>We only collect publicly available information. We don't scrape private data or bypass any
+                        security measures. All outreach is opt-in and includes unsubscribe options.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section cta-section">
+    <div class="container">
+        <div class="cta-card">
+            <h2>Ready to 10x Your Lead Generation?</h2>
+            <p>Join 500+ growth teams already using Lead Finder AI. Start your free trial today.</p>
+            <a href="{{ url_for('auth.signup') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-bolt"></i>
+                Start Free Trial
+            </a>
+            <span class="cta-note">No credit card required • 14-day free trial</span>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="{{ url_for('public.landing') }}" class="footer-logo">
+                    <i class="fas fa-bolt"></i>
+                    <span>Lead Finder AI</span>
+                </a>
+                <p>AI-powered lead generation for modern growth teams.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <a href="#features">Features</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#faq">FAQ</a>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="#">About</a>
+                <a href="#">Blog</a>
+                <a href="mailto:hello@leadfinderai.com">Contact</a>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Lead Finder AI. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+{% endblock %}

@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Let's get started{% endblock %}
+
+{% block body_class %}auth-page{% endblock %}
+
+{% block body %}
+<div class="auth-container" style="max-width: 800px;">
+    <div class="auth-card onboarding-card">
+        <div class="onboarding-header">
+            <h1>Welcome to Lead Finder AI! 🚀</h1>
+            <p>Let's configure your account to find your perfect customers.</p>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar" style="width: 25%"></div>
+        </div>
+
+        <form id="onboardingForm" method="POST" action="{{ url_for('auth.onboarding') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <!-- Step 1: Target Audience -->
+            <div class="onboarding-step active" id="step1">
+                <h2>1. Who is your ideal customer?</h2>
+                <div class="options-grid">
+                    <label class="option-card">
+                        <input type="radio" name="audience" value="marketing_agency" checked>
+                        <span class="icon">📢</span>
+                        <span class="title">Marketing Agencies</span>
+                        <span class="desc">Looking for white-label services or tools</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="audience" value="saas_founders">
+                        <span class="icon">💻</span>
+                        <span class="title">SaaS Founders</span>
+                        <span class="desc">Developers needing growth or tech help</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="audience" value="ecommerce">
+                        <span class="icon">🛍️</span>
+                        <span class="title">E-commerce</span>
+                        <span class="desc">Shopify owners, dropshippers</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="audience" value="coaches">
+                        <span class="icon">🎓</span>
+                        <span class="title">Coaches & Consultants</span>
+                        <span class="desc">Experts looking to scale</span>
+                    </label>
+                    <label class="option-card">
+                        <input type="radio" name="audience" value="other">
+                        <span class="icon">🎯</span>
+                        <span class="title">Other / Custom</span>
+                        <span class="desc">I'll define my own keywords</span>
+                    </label>
+                </div>
+                <button type="button" class="btn btn-primary btn-block btn-next" onclick="nextStep(2)">Next Step
+                    &rarr;</button>
+            </div>
+
+            <!-- Step 2: Keywords -->
+            <div class="onboarding-step" id="step2" style="display:none;">
+                <h2>2. Keywords Configuration</h2>
+                <p>We've selected some keywords based on your choice. Feel free to edit them.</p>
+
+                <div class="form-group">
+                    <label>Target Keywords (one per line)</label>
+                    <textarea name="keywords" id="keywordsInput" class="form-control" rows="8"></textarea>
+                </div>
+
+                <div class="buttons-row">
+                    <button type="button" class="btn btn-ghost" onclick="prevStep(1)">&larr; Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep(3)">Next Step &rarr;</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Languages -->
+            <div class="onboarding-step" id="step3" style="display:none;">
+                <h2>3. Target Languages</h2>
+                <p>Where are your customers located?</p>
+
+                <div class="checkbox-group big-checkboxes">
+                    <label class="checkbox-label card-checkbox">
+                        <input type="checkbox" name="languages" value="en" checked>
+                        <span class="flag">🇬🇧</span> English
+                    </label>
+                    <label class="checkbox-label card-checkbox">
+                        <input type="checkbox" name="languages" value="es">
+                        <span class="flag">🇪🇸</span> Spanish
+                    </label>
+                    <label class="checkbox-label card-checkbox">
+                        <input type="checkbox" name="languages" value="pt">
+                        <span class="flag">🇧🇷</span> Portuguese
+                    </label>
+                    <label class="checkbox-label card-checkbox">
+                        <input type="checkbox" name="languages" value="fr">
+                        <span class="flag">🇫🇷</span> French
+                    </label>
+                </div>
+
+                <div class="buttons-row">
+                    <button type="button" class="btn btn-ghost" onclick="prevStep(2)">&larr; Back</button>
+                    <button type="submit" class="btn btn-primary btn-lg">Finish & Find Leads 🚀</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const TEMPLATES = {
+        'marketing_agency': "need more clients\ncold email not working\nstruggling to get leads\nmarketing automation help\nwhite label seo",
+        'saas_founders': "need developer\nlooking for technical co-founder\nbuild mvp\nreact native developer needed\nstripe integration help",
+        'ecommerce': "shopify help\nfacebook ads scaling\ndropshipping supplier\nemail marketing for ecommerce\nincrease conversion rate",
+        'coaches': "how to get coaching clients\nscale my coaching business\ncourse platform recommendation\nwebinar funnel",
+        'other': "looking for [your service]\nhelp with [your expertise]\nrecommendations for [your niche]"
+    };
+
+    function nextStep(step) {
+        // Logic for Step 1 -> 2: Populate keywords
+        if (step === 2) {
+            const audience = document.querySelector('input[name="audience"]:checked').value;
+            const keywords = TEMPLATES[audience] || TEMPLATES['other'];
+            document.getElementById('keywordsInput').value = keywords;
+        }
+
+        // Hide all steps
+        document.querySelectorAll('.onboarding-step').forEach(el => el.style.display = 'none');
+        // Show current step
+        document.getElementById('step' + step).style.display = 'block';
+        // Update progress
+        document.getElementById('progressBar').style.width = (step * 33) + '%';
+    }
+
+    function prevStep(step) {
+        document.querySelectorAll('.onboarding-step').forEach(el => el.style.display = 'none');
+        document.getElementById('step' + step).style.display = 'block';
+        document.getElementById('progressBar').style.width = (step * 33) + '%';
+    }
+</script>
+
+<style>
+    .onboarding-card {
+        padding: 40px;
+    }
+
+    .onboarding-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .option-card {
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .option-card:hover {
+        border-color: var(--primary-color);
+        background: rgba(37, 99, 235, 0.05);
+    }
+
+    .option-card input {
+        display: none;
+    }
+
+    .option-card input:checked+.icon+.title+.desc,
+    .option-card input:checked~span {
+        color: var(--primary-color);
+    }
+
+    .option-card input:checked~.title {
+        font-weight: bold;
+    }
+
+    .option-card:has(input:checked) {
+        border-color: var(--primary-color);
+        background: rgba(37, 99, 235, 0.1);
+    }
+
+    .icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .title {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .desc {
+        font-size: 0.85rem;
+        color: #666;
+        display: block;
+    }
+
+    .buttons-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .big-checkboxes {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .card-checkbox {
+        border: 1px solid var(--border-color);
+        padding: 15px 25px;
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .card-checkbox:has(input:checked) {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .flag {
+        font-size: 1.5rem;
+    }
+
+    .progress-bar-container {
+        height: 6px;
+        background: #eee;
+        border-radius: 3px;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: var(--primary-color);
+        transition: width 0.3s ease;
+    }
+</style>
+{% endblock %}

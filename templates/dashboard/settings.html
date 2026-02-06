@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo"><i class="fas fa-bolt"></i><span>Lead Finder AI</span></a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="nav-item"><i
+                    class="fas fa-home"></i><span>Overview</span></a>
+            <a href="{{ url_for('dashboard.leads') }}" class="nav-item"><i
+                    class="fas fa-users"></i><span>Leads</span></a>
+            <a href="{{ url_for('dashboard.analytics') }}" class="nav-item"><i
+                    class="fas fa-chart-line"></i><span>Analytics</span></a>
+            <a href="{{ url_for('dashboard.settings') }}" class="nav-item active"><i
+                    class="fas fa-cog"></i><span>Settings</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="nav-item"><i
+                    class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+        </div>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <h1>Settings</h1>
+            <p>Configure your account and search preferences.</p>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Profile Settings -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-user"></i> Profile</h3>
+            <form method="POST" class="settings-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="update_profile">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" name="name" value="{{ current_user.name or '' }}" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" value="{{ current_user.email }}" class="form-control" disabled>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Profile</button>
+            </form>
+        </div>
+
+        <!-- Lead Search Configuration -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-search"></i> Lead Search Configuration</h3>
+            <form method="POST" class="settings-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="update_search">
+
+                <div class="form-group">
+                    <label>Keywords (one per line)</label>
+                    <textarea name="keywords" class="form-control" rows="8"
+                        placeholder="need more clients&#10;cold email not working&#10;looking for developer&#10;how to scale SaaS">{{ user_config.keywords|join('\n') if user_config.keywords else (current_user.keywords.replace(',', '\n') if current_user.keywords else '') }}</textarea>
+                    <small>These are the exact terms we look for in posts.</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Target Subreddits (comma separated)</label>
+                    <input type="text" name="subreddits" class="form-control"
+                        value="{{ user_config.subreddits|join(', ') if user_config.subreddits else 'Entrepreneur, startups, smallbusiness, marketing, SaaS' }}"
+                        placeholder="Entrepreneur, startups, smallbusiness">
+                    <small>Specific subreddits to monitor. Leave empty for defaults.</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Target Languages</label>
+                    <div class="checkbox-group">
+                        {% for lang_code, lang_name in [('en', 'English'), ('es', 'Spanish'), ('pt', 'Portuguese'),
+                        ('fr', 'French')] %}
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="languages" value="{{ lang_code }}" {% if not
+                                user_config.languages or lang_code in user_config.languages %}checked{% endif %}>
+                            <span>{{ lang_name }} ({{ lang_code|upper }})</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Minimum Lead Score (1-10)</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="range" name="min_score" min="1" max="10" value="{{ user_config.min_score or 7 }}"
+                            oninput="document.getElementById('scoreOutput').value = this.value" style="flex-grow: 1;">
+                        <output id="scoreOutput" style="font-weight: bold; min-width: 30px;">{{ user_config.min_score or
+                            7 }}</output>
+                    </div>
+                    <small>Only save leads with this score or higher. Setting it too low (e.g. 1) will fill your
+                        dashboard with noise.</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Platforms</label>
+                    <div class="checkbox-group">
+                        {% for platform in ['reddit', 'hackernews', 'indie_hackers'] %}
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="platforms" value="{{ platform }}" {% if not
+                                user_config.active_platforms or platform in user_config.active_platforms %}checked{%
+                                endif %} {% if platform not in plan_limits.get('platforms', []) and
+                                plan_limits.get('platforms') !='all' %}disabled{% endif %}>
+                            <span>{{ platform|replace('_', ' ')|title }}</span>
+                            {% if platform not in plan_limits.get('platforms', []) and plan_limits.get('platforms') !=
+                            'all' %}
+                            <span class="badge">Pro</span>
+                            {% endif %}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save Configuration</button>
+            </form>
+        </div>
+
+        <!-- Email Configuration -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-envelope"></i> Email Configuration</h3>
+
+            <form method="POST" class="settings-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="update_email_config">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Sender Name</label>
+                        <input type="text" name="sender_name" class="form-control" placeholder="John from LeadFinder"
+                            value="{{ smtp_config.sender_name or current_user.name or '' }}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>SMTP Server</label>
+                        <input type="text" name="smtp_server" class="form-control" placeholder="smtp.gmail.com"
+                            value="{{ smtp_config.smtp_server or '' }}">
+                    </div>
+                    <div class="form-group" style="flex: 0 0 100px;">
+                        <label>Port</label>
+                        <input type="number" name="smtp_port" class="form-control"
+                            value="{{ smtp_config.smtp_port or 587 }}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>SMTP Username (Email)</label>
+                        <input type="email" name="smtp_username" class="form-control" placeholder="you@gmail.com"
+                            value="{{ smtp_config.smtp_username or '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label>SMTP Password / App Password</label>
+                        <input type="password" name="smtp_password" class="form-control" placeholder="••••••••••••"
+                            value="{{ '********' if smtp_config.is_configured else '' }}">
+                        <small>For Gmail, use an <a href="https://myaccount.google.com/apppasswords" target="_blank">App
+                                Password</a>.</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Signature</label>
+                    <textarea name="email_signature" class="form-control" rows="4"
+                        placeholder="Best,&#10;John">{{ current_user.email_signature or '' }}</textarea>
+                </div>
+
+                <div class="form-actions" style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary">Save Email Settings</button>
+                    {% if smtp_config.is_configured %}
+                    <button type="submit" name="test_connection" value="true" class="btn btn-outline-secondary"
+                        formnovalidate>Test Connection</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Subscription -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-credit-card"></i> Subscription</h3>
+            <div class="subscription-info">
+                <div class="current-plan">
+                    <span class="plan-label">Current Plan:</span>
+                    <span class="plan-badge {{ current_user.plan }}">{{ current_user.plan|title }}</span>
+                </div>
+                <p>
+                    <strong>{{ plan_limits.get('max_leads', 0) }}</strong> leads/month •
+                    <strong>{{ plan_limits.get('max_emails', 0) }}</strong> emails/month
+                </p>
+                {% if current_user.plan != 'pro' %}
+                <a href="{{ url_for('public.pricing') }}" class="btn btn-primary">Upgrade Plan</a>
+                {% endif %}
+                {% if current_user.plan != 'free' %}
+                <a href="{{ url_for('billing.billing_history') }}" class="btn btn-ghost">View Billing History</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-lock"></i> Change Password</h3>
+            <form method="POST" class="settings-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="change_password">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" name="current_password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" name="new_password" class="form-control" minlength="8" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Change Password</button>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

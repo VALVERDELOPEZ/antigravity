@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viral Vortex Pro | Centro de Comando</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --secondary: #3a7bd5;
+            --accent: #ff007a;
+            --bg: #05070a;
+            --surface: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #e0e6ed;
+            --text-dim: #94a3b8;
+            --sidebar-w: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-w);
+            border-right: 1px solid var(--border);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(20px);
+            position: fixed;
+            height: 100vh;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--surface);
+            color: white;
+            border: 1px solid var(--border);
+        }
+
+        /* Main Content */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        .stat-card h4 {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .campaign-form {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-family: inherit;
+        }
+
+        .btn-launch {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            color: #001;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .persona-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 210, 255, 0.1);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-right: 5px;
+        }
+
+        /* dynamic sections */
+        .dashboard-section {
+            display: none;
+        }
+
+        .dashboard-section.active {
+            display: block;
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, #111, #221, #111);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+            height: 20px;
+            margin-bottom: 10px;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .history-item {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .status-msg {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            text-align: center;
+        }
+
+        .status-success {
+            background: rgba(0, 255, 122, 0.1);
+            color: #00ff7a;
+            border: 1px solid rgba(0, 255, 122, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <a href="/" class="logo">VIRAL VORTEX PRO</a>
+        <div class="nav-item active" onclick="showTab('dashboard', this)">Panel Principal</div>
+        <div class="nav-item" onclick="showTab('personas', this)">Personas / Cuentas</div>
+        <div class="nav-item" onclick="showTab('library', this)">Biblioteca de Contenido</div>
+        <div class="nav-item" onclick="showTab('video', this)">Estudio de Video (Wan 2.1)</div>
+        <div class="nav-item" onclick="showTab('leads', this)">CRM / Leads (Regalos)</div>
+        <div class="nav-item" onclick="showTab('automation', this)">Mkt Autónomo (EN/ES)</div>
+        <div class="nav-item" onclick="showTab('proxy', this)">Ajustes de Proxy</div>
+        <div class="nav-item" onclick="showTab('billing', this)">Pagos / Stripe</div>
+    </div>
+
+    <div class="main">
+        <!-- Dashboard Section -->
+        <div id="section-dashboard" class="dashboard-section active">
+            <header>
+                <div>
+                    <h1 style="font-family: 'Space Grotesk';">Centro de Campañas</h1>
+                    <p style="color: var(--text-dim); font-size: 0.9rem;">Bienvenido de nuevo, CEO. Tu motor está listo.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <div class="persona-badge"
+                        style="border-color: #ffd700; color: #ffd700; background: rgba(255,215,0,0.1); font-weight: 700;">
+                        OBJETIVO: 1.2M IMPRESIONES 🚀</div>
+                    <div class="persona-badge" id="activePersonasCount">Cargando...</div>
+                    <div class="persona-badge"
+                        style="border-color: var(--primary); color: var(--primary); background: rgba(0,210,255,0.1);">
+                        Global: Ready (ES/EN)</div>
+                </div>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Impresiones Reales</h4>
+                    <p id="stat-impressions">--</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Media Virilidad</h4>
+                    <p id="stat-score">--</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Leads Capturados</h4>
+                    <p id="stat-leads">--</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Conversión</h4>
+                    <p id="stat-cvr">--</p>
+                </div>
+            </div>
+
+            <div class="campaign-form">
+                <h3 style="margin-bottom: 20px;">Lanzar Nueva Campaña Autónoma</h3>
+                <div class="input-group">
+                    <label>Tema Principal / Objetivo</label>
+                    <input type="text" id="campaignTopic" placeholder="ej. Promocionar mi newsletter de IA">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="input-group">
+                        <label>Comunidad Objetivo</label>
+                        <select id="campaignTarget">
+                            <option value="reddit|r/sideproject">r/sideproject (Reddit)</option>
+                            <option value="reddit|r/saas">r/saas (Reddit)</option>
+                            <option value="twitter|AI_Automation">Twitter: AI Automation</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Persona Digital</label>
+                        <select id="personaList">
+                            <!-- Injected by JS -->
+                        </select>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="input-group">
+                        <label>Idioma del Contenido</label>
+                        <select id="campaignLanguage">
+                            <option value="es" selected>Español (Mercado Local)</option>
+                            <option value="en">English (US/UK Global Market)</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Generación de Video (Opcional - Coste Extra)</label>
+                        <select id="useVideo">
+                            <option value="no" selected>Solo Texto (Máxima Velocidad - RECOMENDADO)</option>
+                            <option value="pro">Generar Clip Viral Cinemático (WAN 2.1 API)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-launch" onclick="launchVortex()">INICIAR MOTOR VORTEX</button>
+                <div id="statusBox" class="status-msg status-success"></div>
+            </div>
+        </div>
+
+        <!-- Library Section -->
+        <div id="section-library" class="dashboard-section">
+            <h1 style="font-family: 'Space Grotesk'; margin-bottom: 30px;">Biblioteca de Contenido Viral</h1>
+            <div id="historyContainer" class="history-list">
+                <!-- Injected by JS -->
+            </div>
+        </div>
+
+        <!-- Placeholder Sections -->
+        <div id="section-personas" class="dashboard-section">
+            <h1>Gestión de Personas</h1>
+            <p style="color:var(--text-dim)">Módulo de identidades digitales persistentes con memoria RAG.</p>
+        </div>
+        <div id="section-video" class="dashboard-section">
+            <h1>Estudio de Video Wan 2.1</h1>
+            <p style="color:var(--text-dim)">Generador de clips cinemáticos para redes sociales.</p>
+        </div>
+        <div id="section-proxy" class="dashboard-section">
+            <h1>Configuración de Proxy</h1>
+            <p style="color:var(--text-dim)">Túneles seguros para proteger tus cuentas de baneos.</p>
+        </div>
+
+        <!-- CRM / Leads Section -->
+        <div id="section-leads" class="dashboard-section">
+            <h1 style="font-family: 'Space Grotesk'; margin-bottom: 30px;">CRM Lite: Leads de Regalos</h1>
+            <div id="leadsContainer" class="history-list">
+                <p style="color:var(--text-dim)">Cargando base de datos de leads...</p>
+            </div>
+        </div>
+
+        <!-- Automation Section -->
+        <div id="section-automation" class="dashboard-section">
+            <h1 style="font-family: 'Space Grotesk'; margin-bottom: 30px;">Marketing Autónomo Global</h1>
+            <div class="card" style="border-color: var(--primary); background: rgba(0,210,255,0.05);">
+                <h3 style="color: var(--primary); margin-bottom:15px;">ESTADO DEL MOTOR: ACTIVO ⚡</h3>
+                <p style="color: var(--text-dim); line-height:1.6;">
+                    El orquestador está sembrando hilos virales en: <br>
+                    <strong>🇺🇸 r/sideproject, r/saas</strong> (Público Global)<br>
+                    <strong>🇪🇸 r/emprendedores, AI_Automation</strong> (Público Local)<br><br>
+                    Próximo post programado: <span id="nextPostTime" style="color:white; font-weight:600;">En 4 horas
+                        aprox.</span>
+                </p>
+                <div style="margin-top:20px; padding-top:20px; border-top: 1px solid var(--border);">
+                    <p style="font-size:0.8rem; color:var(--text-dim);">Estrategia seleccionada: <strong>Crecimiento
+                            Orgánico con Ganchos STEPPS (Texto Only)</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadHistory();
+            loadLeads();
+            loadPersonas();
+        });
+
+        function showTab(tabId, el) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.dashboard-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('section-' + tabId).classList.add('active');
+        }
+
+        async function loadStats() {
+            const r = await fetch('/api/stats');
+            const res = await r.json();
+            if (res.success) {
+                document.getElementById('stat-impressions').innerText = res.data.impressions;
+                document.getElementById('stat-score').innerText = res.data.avg_score + "/10";
+                document.getElementById('stat-leads').innerText = res.data.leads;
+                document.getElementById('stat-cvr').innerText = res.data.conversion;
+                document.getElementById('activePersonasCount').innerText = "Personas Activas: " + res.data.leads || 12;
+            }
+        }
+
+        async function loadPersonas() {
+            const r = await fetch('/api/personas');
+            const res = await r.json();
+            if (res.success) {
+                const select = document.getElementById('personaList');
+                select.innerHTML = res.data.map(p => `<option value="${p.name}">${p.name} (${p.tone})</option>`).join('');
+            }
+        }
+
+        async function loadHistory() {
+            const container = document.getElementById('historyContainer');
+            container.innerHTML = '<div class="loading-shimmer"></div><div class="loading-shimmer"></div>';
+
+            const r = await fetch('/api/history');
+            const res = await r.json();
+            if (res.success) {
+                container.innerHTML = res.data.map(h => `
+                    <div class="history-item">
+                        <p style="font-weight:500;">"${h.content}"</p>
+                        <div class="history-meta">
+                            <span>PLATAFORMA: ${h.platform.toUpperCase()}</span>
+                            <span>PERSONA: ${h.personas?.name || 'Sistema'}</span>
+                            <span style="color:var(--primary)">VORTEX SCORE: ${h.virality_score}/10</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function launchVortex() {
+            const topic = document.getElementById('campaignTopic').value;
+            if (!topic) return alert("Escribe un tema");
+
+            const btn = document.querySelector('.btn-launch');
+            const box = document.getElementById('statusBox');
+
+            btn.disabled = true;
+            btn.innerText = "Iniciando Vortex... (Espere)";
+
+            const r = await fetch('/api/launch-campaign', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    topic: topic,
+                    persona: document.getElementById('personaList').value,
+                    platform: document.getElementById('campaignTarget').value.split('|')[0],
+                    community: document.getElementById('campaignTarget').value.split('|')[1],
+                    is_pro: document.getElementById('useVideo').value === 'pro',
+                    language: document.getElementById('campaignLanguage').value
+                })
+            });
+
+            const res = await r.json();
+            if (res.success) {
+                box.style.display = 'block';
+                box.innerHTML = `🔥 <strong>Vortex Iniciado:</strong> ${res.message}. El video Wan 2.1 aparecerá en tu biblioteca en unos minutos.`;
+                setTimeout(() => {
+                    box.style.display = 'none';
+                    btn.disabled = false;
+                    btn.innerText = "INICIAR MOTOR VORTEX";
+                    loadHistory();
+                }, 6000);
+            }
+        }
+
+        async function loadLeads() {
+            const container = document.getElementById('leadsContainer');
+            if (!container) return;
+            try {
+                const r = await fetch('/api/leads');
+                const res = await r.json();
+                if (res.success) {
+                    container.innerHTML = res.data.length ? res.data.map(l => `
+                        <div class="history-item">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <strong>${l.email}</strong>
+                                <span class="persona-badge" style="background:rgba(255,0,122,0.1); border-color:var(--accent); color:var(--accent);">${l.source || 'vortex_checker'}</span>
+                            </div>
+                            <div class="history-meta" style="margin-top:10px; display:flex; justify-content:space-between;">
+                                <span>REGISTRADO: ${new Date(l.created_at).toLocaleString()}</span>
+                                <span style="color:var(--primary); font-weight:600;">REGALO: REPORTE ENVIADO 🎁</span>
+                            </div>
+                        </div>
+                    `).join('') : '<p style="color:var(--text-dim)">Aún no hay leads capturados. Promociona el Checker Tool para empezar.</p>';
+                }
+            } catch (e) { console.error(e); }
+        }
+    </script>
+</body>
+
+</html>

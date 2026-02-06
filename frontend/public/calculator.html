@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>SaaS Waste Calculator | How Much Are You Losing?</title>
+    <meta name="description"
+        content="Calculate how much money your company is wasting on unused SaaS licenses. Free calculator based on industry benchmarks." />
+    <style>
+        :root {
+            font-family: 'Inter', system-ui, sans-serif;
+            --accent-cyan: #00E5FF;
+            --accent-purple: #8B5CF6;
+            --bg-dark: #090909;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --color-danger: #FF6B6B;
+            --color-success: #4ADE80;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: radial-gradient(ellipse at top, #0f0f1a, var(--bg-dark) 70%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #fff, var(--color-danger));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-glass);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        select option {
+            background: #1a1a2e;
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+            margin-top: 1rem;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.6);
+        }
+
+        /* Results */
+        .results {
+            display: none;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .results.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .waste-amount {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--color-danger);
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+            margin: 1rem 0;
+        }
+
+        .waste-label {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+        }
+
+        .breakdown {
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .breakdown-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .breakdown-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .breakdown-item .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .cta-section {
+            margin-top: 2rem;
+        }
+
+        .btn-cta {
+            display: inline-block;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: var(--color-success);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .btn-cta:hover {
+            transform: scale(1.05);
+        }
+
+        .email-capture {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .email-capture input {
+            flex: 1;
+        }
+
+        .email-capture button {
+            padding: 1rem 1.5rem;
+            background: var(--accent-cyan);
+            color: #000;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>💸 SaaS Waste Calculator</h1>
+        <p class="subtitle">Descubre cuánto dinero estás tirando cada mes en licencias que nadie usa.</p>
+
+        <div class="card" id="calculator">
+            <div class="form-group">
+                <label>Número de empleados</label>
+                <input type="number" id="employees" placeholder="ej: 75" min="1" value="75">
+            </div>
+            <div class="form-group">
+                <label>Gasto mensual estimado en SaaS ($)</label>
+                <input type="number" id="saasSpend" placeholder="ej: 15000" min="100" value="15000">
+            </div>
+            <div class="form-group">
+                <label>Industria</label>
+                <select id="industry">
+                    <option value="fintech">Fintech / Financial Services</option>
+                    <option value="marketing">Agency / AdTech</option>
+                    <option value="startup" selected>Tech Startup / Scale-up</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <button class="btn-calculate" onclick="calculate()">Calcular mi desperdicio 💀</button>
+        </div>
+
+        <div class="results" id="results">
+            <p class="waste-label">Estás perdiendo aproximadamente</p>
+            <div class="waste-amount" id="wasteAmount">$0</div>
+            <p class="waste-label">al año en licencias fantasma</p>
+
+            <div class="breakdown">
+                <div class="breakdown-item">
+                    <div class="value" id="monthlyWaste">$0</div>
+                    <div class="label">Desperdicio mensual</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="value" id="unusedLicenses">0</div>
+                    <div class="label">Licencias sin usar (est.)</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="value" id="zombieApps">0</div>
+                    <div class="label">Apps zombies (est.)</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="value" id="recoverable">$0</div>
+                    <div class="label">Recuperable en 90 días</div>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <p style="margin-bottom: 1rem; color: var(--text-muted);">Recibe un análisis gratuito de tus facturas
+                    SaaS:</p>
+                <div class="email-capture">
+                    <input type="email" id="leadEmail" placeholder="tu@empresa.com">
+                    <button onclick="captureEmail()">Enviar</button>
+                </div>
+                <p id="emailSuccess" style="display: none; color: var(--color-success); margin-top: 1rem;">✅ ¡Gracias!
+                    Te contactaremos pronto.</p>
+            </div>
+        </div>
+
+        <p class="footer">Powered by <a href="#">Ghost License Reaper</a> · Datos basados en benchmarks de industria
+            2025-2026</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://ykxomhorciutqsahqges.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreG9taG9yY2l1dHFzYWhxZ2VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzMjc5MjAsImV4cCI6MjA4NTkwMzkyMH0.C1ZDWua0YuiSHS0l3b_L1qvLWJeibvGkSZOcdsQJHJA';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Industry waste coefficients (based on research)
+        const industryCoefficients = {
+            fintech: 0.42,    // 42% waste (high AI tool sprawl)
+            marketing: 0.38,  // 38% waste
+            startup: 0.37,    // 37% waste (validated benchmark)
+            other: 0.30
+        };
+
+        let calculatedData = {};
+
+        function calculate() {
+            const employees = parseInt(document.getElementById('employees').value) || 75;
+            const saasSpend = parseInt(document.getElementById('saasSpend').value) || 15000;
+            const industry = document.getElementById('industry').value;
+
+            const wasteRate = industryCoefficients[industry];
+            const monthlyWaste = saasSpend * wasteRate;
+            const yearlyWaste = monthlyWaste * 12;
+            const unusedLicenses = Math.round(employees * 0.53); // 53% industry average
+            const zombieApps = Math.round((employees / 10) * 1.5); // Estimate
+            const recoverable = Math.round(monthlyWaste * 3 * 0.8); // 80% of 3 months
+
+            // Store for lead capture
+            calculatedData = { employees, saasSpend, industry, yearlyWaste: Math.round(yearlyWaste) };
+
+            // Display results
+            document.getElementById('wasteAmount').textContent = formatCurrency(yearlyWaste);
+            document.getElementById('monthlyWaste').textContent = formatCurrency(monthlyWaste);
+            document.getElementById('unusedLicenses').textContent = unusedLicenses;
+            document.getElementById('zombieApps').textContent = zombieApps;
+            document.getElementById('recoverable').textContent = formatCurrency(recoverable);
+
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
+        }
+
+        async function captureEmail() {
+            const email = document.getElementById('leadEmail').value;
+            if (email && email.includes('@')) {
+                try {
+                    const { error } = await supabase.from('leads').insert({
+                        email: email,
+                        employees: calculatedData.employees,
+                        monthly_spend: calculatedData.saasSpend,
+                        industry: calculatedData.industry,
+                        estimated_waste: calculatedData.yearlyWaste,
+                        source: 'calculator'
+                    });
+
+                    if (error) {
+                        console.error('Error saving lead:', error);
+                        if (error.code === '23505') {
+                            document.getElementById('emailSuccess').textContent = '⚠️ Este email ya está registrado.';
+                        } else {
+                            document.getElementById('emailSuccess').textContent = '❌ Error al guardar. Intenta de nuevo.';
+                        }
+                    } else {
+                        document.getElementById('emailSuccess').textContent = '✅ ¡Gracias! Te contactaremos pronto.';
+                        document.getElementById('leadEmail').disabled = true;
+                    }
+                    document.getElementById('emailSuccess').style.display = 'block';
+                } catch (err) {
+                    console.error('Unexpected error:', err);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

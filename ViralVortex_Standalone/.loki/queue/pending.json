@@ -1,0 +1,14 @@
+[
+    {
+        "id": "task-001",
+        "priority": "High",
+        "description": "Initialize Supabase Database Schema",
+        "status": "pending"
+    },
+    {
+        "id": "task-002",
+        "priority": "High",
+        "description": "Implement STEPPS Evaluator Logic",
+        "status": "pending"
+    }
+]

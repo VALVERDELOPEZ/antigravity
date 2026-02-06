@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Leads{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <i class="fas fa-bolt"></i>
+                <span>Lead Finder AI</span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('dashboard.leads') }}" class="nav-item active">
+                <i class="fas fa-users"></i>
+                <span>Leads</span>
+            </a>
+            <a href="{{ url_for('dashboard.analytics') }}" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+            <a href="{{ url_for('dashboard.settings') }}" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1>Leads</h1>
+                <p>Browse and manage your qualified leads.</p>
+            </div>
+            <div class="header-right">
+                <div class="filter-group">
+                    <select id="platformFilter" class="form-select">
+                        <option value="">All Platforms</option>
+                        <option value="reddit">Reddit</option>
+                        <option value="twitter">Twitter</option>
+                        <option value="hackernews">Hacker News</option>
+                        <option value="indiehackers">Indie Hackers</option>
+                        <option value="linkedin">LinkedIn</option>
+                    </select>
+                    <select id="languageFilter" class="form-select">
+                        <option value="">🌐 All Languages</option>
+                        <option value="en">🇬🇧 English</option>
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="pt">🇧🇷 Português</option>
+                        <option value="fr">🇫🇷 Français</option>
+                    </select>
+                    <select id="scoreFilter" class="form-select">
+                        <option value="">All Scores</option>
+                        <option value="9">9+ (Elite)</option>
+                        <option value="7">7+ (Hot)</option>
+                        <option value="5">5+ (Warm)</option>
+                    </select>
+                    <select id="statusFilter" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="new">New</option>
+                        <option value="contacted">📩 Contacted</option>
+                        <option value="responded">🔥 Responded</option>
+                        <option value="converted">✅ Converted</option>
+                    </select>
+                </div>
+                <input type="search" class="search-input" placeholder="Search leads..." id="searchInput">
+            </div>
+        </header>
+
+        <div class="dashboard-card">
+            <div class="table-container">
+                <table class="data-table leads-table">
+                    <thead>
+                        <tr>
+                            <th>Lead</th>
+                            <th>Platform</th>
+                            <th>Idioma</th>
+                            <th>Fuente</th>
+                            <th>Problem</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in leads %}
+                        <tr>
+                            <td>
+                                <div class="lead-info">
+                                    <span class="lead-name">@{{ lead.username }}</span>
+                                    <a href="{{ lead.post_url }}" target="_blank" class="lead-link">
+                                        {{ lead.title[:40] }}{% if lead.title|length > 40 %}...{% endif %}
+                                    </a>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="platform-badge {{ lead.platform }}">{{ lead.platform|title }}</span>
+                            </td>
+                            <td>
+                                <span class="language-badge {{ lead.language or 'en' }}"
+                                    title="Language: {{ lead.language or 'en' }}">
+                                    {% if lead.language == 'es' %}
+                                    🇪🇸 ES
+                                    {% elif lead.language == 'pt' %}
+                                    🇧🇷 PT
+                                    {% elif lead.language == 'fr' %}
+                                    🇫🇷 FR
+                                    {% else %}
+                                    🇬🇧 EN
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if lead.source_type == 'real' %}
+                                <span class="source-badge real" title="Scraped from {{ lead.source or lead.platform }}">
+                                    <i class="fas fa-check-circle"></i>
+                                    {% if lead.platform == 'reddit' %}
+                                    Reddit ({{ lead.source|replace('r/', '') if lead.source else 'real' }})
+                                    {% elif lead.platform == 'hackernews' %}
+                                    HN ({{ lead.source or 'real' }})
+                                    {% elif lead.platform == 'indiehackers' %}
+                                    IndieH (real)
+                                    {% else %}
+                                    {{ lead.platform|title }} (real)
+                                    {% endif %}
+                                </span>
+                                {% elif lead.source_type == 'ai_generated' %}
+                                <span class="source-badge ai" title="Generated by AI">
+                                    <i class="fas fa-robot"></i> AI
+                                </span>
+                                {% else %}
+                                <span class="source-badge demo" title="Demo data">
+                                    <i class="fas fa-flask"></i> Demo
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="problem-text">{{ lead.problem_summary[:50] if lead.problem_summary else
+                                    lead.content[:50] }}...</span>
+                            </td>
+                            <td>
+                                <span
+                                    class="score-badge {% if lead.score >= 8 %}high{% elif lead.score >= 5 %}medium{% else %}low{% endif %}">
+                                    {{ lead.score }}/10
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge {{ lead.status }}">{{ lead.status|title }}</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ lead.post_url }}" target="_blank" class="btn btn-icon"
+                                        title="View Post">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    {% if not lead.email_sent %}
+                                    <button class="btn btn-icon btn-primary" title="Send Email"
+                                        onclick="sendEmail({{ lead.id }})">
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                    {% else %}
+                                    <span class="btn btn-icon disabled" title="Email Sent">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>No leads found. Adjust your filters or wait for the next scrape.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if pagination.pages > 1 %}
+            <div class="pagination">
+                {% if pagination.has_prev %}
+                <a href="?page={{ pagination.prev_num }}" class="btn btn-ghost">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                {% endif %}
+
+                <span class="page-info">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+
+                {% if pagination.has_next %}
+                <a href="?page={{ pagination.next_num }}" class="btn btn-ghost">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function sendEmail(leadId) {
+        if (!confirm('Send AI-generated email to this lead?')) return;
+
+        fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lead_id: leadId })
+        })
+            .then(r => r.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) location.reload();
+            });
+    }
+
+    // Filters
+    document.getElementById('platformFilter').addEventListener('change', applyFilters);
+    document.getElementById('languageFilter').addEventListener('change', applyFilters);
+    document.getElementById('scoreFilter').addEventListener('change', applyFilters);
+    document.getElementById('searchInput').addEventListener('input', debounce(applyFilters, 500));
+
+    function applyFilters() {
+        const platform = document.getElementById('platformFilter').value;
+        const language = document.getElementById('languageFilter').value;
+        const score = document.getElementById('scoreFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        const search = document.getElementById('searchInput').value;
+
+        let url = '?';
+        if (platform) url += `platform=${platform}&`;
+        if (language) url += `language=${language}&`;
+        if (score) url += `min_score=${score}&`;
+        if (status) url += `status=${status}&`;
+        if (search) url += `search=${encodeURIComponent(search)}&`;
+
+        window.location.href = url;
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function (...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+</script>
+{% endblock %}

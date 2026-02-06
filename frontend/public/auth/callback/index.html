@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authenticating... | Ghost License Reaper</title>
+    <style>
+        :root {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(ellipse at top, #0f0f1a, #090909 70%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00E5FF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .status {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .error {
+            color: #FF6B6B;
+        }
+
+        a {
+            color: #00E5FF;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="spinner" id="spinner"></div>
+    <div class="status" id="status">Completing sign in...</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://ykxomhorciutqsahqges.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreG9taG9yY2l1dHFzYWhxZ2VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzMjc5MjAsImV4cCI6MjA4NTkwMzkyMH0.C1ZDWua0YuiSHS0l3b_L1qvLWJeibvGkSZOcdsQJHJA';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        const spinner = document.getElementById('spinner');
+        const status = document.getElementById('status');
+
+        async function handleCallback() {
+            try {
+                // Get session from URL hash/callback
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) throw error;
+
+                if (session) {
+                    status.textContent = '✅ Signed in successfully!';
+
+                    // Check onboarding status
+                    const { data: progress } = await supabase
+                        .from('onboarding_progress')
+                        .select('is_onboarding_complete')
+                        .eq('user_id', session.user.id)
+                        .single();
+
+                    setTimeout(() => {
+                        if (progress?.is_onboarding_complete) {
+                            window.location.href = '/';
+                        } else {
+                            window.location.href = '/onboarding.html';
+                        }
+                    }, 1000);
+                } else {
+                    throw new Error('No session found');
+                }
+            } catch (error) {
+                spinner.style.display = 'none';
+                status.innerHTML = `<span class="error">❌ ${error.message}</span><br><br><a href="/login.html">Try again</a>`;
+            }
+        }
+
+        handleCallback();
+    </script>
+</body>
+
+</html>

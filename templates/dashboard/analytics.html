@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <i class="fas fa-bolt"></i>
+                <span>Lead Finder AI</span>
+            </a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="nav-item"><i
+                    class="fas fa-home"></i><span>Overview</span></a>
+            <a href="{{ url_for('dashboard.leads') }}" class="nav-item"><i
+                    class="fas fa-users"></i><span>Leads</span></a>
+            <a href="{{ url_for('dashboard.analytics') }}" class="nav-item active"><i
+                    class="fas fa-chart-line"></i><span>Analytics</span></a>
+            <a href="{{ url_for('dashboard.settings') }}" class="nav-item"><i
+                    class="fas fa-cog"></i><span>Settings</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="nav-item"><i
+                    class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+        </div>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <h1>Analytics</h1>
+            <p>Track your lead generation performance.</p>
+        </header>
+
+        <div class="analytics-grid">
+            <div class="dashboard-card">
+                <h3>Leads by Platform</h3>
+                <div class="chart-container">
+                    <canvas id="platformChart"></canvas>
+                </div>
+            </div>
+            <div class="dashboard-card">
+                <h3>Score Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="scoreChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Email Performance (Last 30 Days)</h3>
+            <div class="chart-container wide">
+                <canvas id="emailChart"></canvas>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fas fa-envelope"></i></div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ current_user.emails_sent_count }}</span>
+                    <span class="stat-label">Total Emails Sent</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fas fa-envelope-open"></i></div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ current_user.emails_opened_count }}</span>
+                    <span class="stat-label">Emails Opened</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fas fa-reply"></i></div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ current_user.emails_replied_count }}</span>
+                    <span class="stat-label">Replies Received</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange"><i class="fas fa-percentage"></i></div>
+                <div class="stat-content">
+                    <span class="stat-value">{% if current_user.emails_sent_count > 0 %}{{
+                        ((current_user.emails_replied_count / current_user.emails_sent_count) * 100)|round(1) }}%{% else
+                        %}0%{% endif %}</span>
+                    <span class="stat-label">Conversion Rate</span>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const platformData = {{ leads_by_platform| tojson | safe if leads_by_platform else '[]' }};
+    const scoreData = {{ score_distribution| tojson | safe if score_distribution else '[]' }};
+
+    // Platform Chart
+    new Chart(document.getElementById('platformChart'), {
+        type: 'doughnut',
+        data: {
+            labels: platformData.map(p => p[0] || 'Unknown'),
+            datasets: [{
+                data: platformData.map(p => p[1]),
+                backgroundColor: ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4']
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // Score Chart
+    new Chart(document.getElementById('scoreChart'), {
+        type: 'bar',
+        data: {
+            labels: scoreData.map(s => s[0]),
+            datasets: [{
+                label: 'Leads',
+                data: scoreData.map(s => s[1]),
+                backgroundColor: '#6366f1'
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+</script>
+{% endblock %}

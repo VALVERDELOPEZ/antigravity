@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo">
+                <i class="fas fa-bolt"></i>
+                <span>Lead Finder AI</span>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Overview</span>
+            </a>
+            <a href="{{ url_for('dashboard.leads') }}" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Leads</span>
+                <span class="nav-badge">{{ total_leads }}</span>
+            </a>
+            <a href="{{ url_for('dashboard.analytics') }}" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+            <a href="{{ url_for('dashboard.settings') }}" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-plan">
+            <div class="plan-badge {{ current_user.plan }}">
+                {{ current_user.plan|title }}
+            </div>
+            {% if current_user.plan == 'free' %}
+            <a href="{{ url_for('public.pricing') }}" class="btn btn-primary btn-sm">Upgrade</a>
+            {% endif %}
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('auth.logout') }}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1>Welcome back, {{ current_user.name or 'there' }}!</h1>
+                <p>Here's what's happening with your leads.</p>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-outline" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ total_leads }}</span>
+                    <span class="stat-label">Total Leads</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ high_score_leads }}</span>
+                    <span class="stat-label">High Score (8+)</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ emails_sent }}</span>
+                    <span class="stat-label">Emails Sent</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="fas fa-reply"></i>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ conversion_rate }}%</span>
+                    <span class="stat-label">Reply Rate</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Leads -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2>Recent Leads</h2>
+                <a href="{{ url_for('dashboard.leads') }}" class="btn btn-ghost">View All</a>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Lead</th>
+                            <th>Platform</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in recent_leads %}
+                        <tr>
+                            <td>
+                                <div class="lead-info">
+                                    <span class="lead-name">@{{ lead.username }}</span>
+                                    <span class="lead-title">{{ lead.title[:50] }}{% if lead.title|length > 50 %}...{%
+                                        endif %}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="platform-badge {{ lead.platform }}">{{ lead.platform|title }}</span>
+                            </td>
+                            <td>
+                                <span
+                                    class="score-badge {% if lead.score >= 8 %}high{% elif lead.score >= 5 %}medium{% else %}low{% endif %}">
+                                    {{ lead.score }}/10
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge {{ lead.status }}">{{ lead.status|title }}</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ lead.post_url }}" target="_blank" class="btn btn-icon"
+                                        title="View Post">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <button class="btn btn-icon" title="Send Email"
+                                        onclick="openEmailModal({{ lead.id }})">
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>No leads yet. Configure your keywords in Settings to start finding leads.</p>
+                                <a href="{{ url_for('dashboard.settings') }}" class="btn btn-primary">Configure
+                                    Keywords</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Automation Status -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2>Automation Status</h2>
+            </div>
+            <div class="automation-status">
+                <div class="status-indicator active">
+                    <i class="fas fa-circle"></i>
+                    <span>Active</span>
+                </div>
+                <p>Next scrape in <strong>4 hours 23 minutes</strong></p>
+                {% if current_user.plan == 'free' %}
+                <div class="upgrade-prompt">
+                    <i class="fas fa-lock"></i>
+                    <span>Automatic scraping available on Starter plan and above.</span>
+                    <a href="{{ url_for('public.pricing') }}" class="btn btn-primary btn-sm">Upgrade</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Email Modal -->
+<div class="modal" id="emailModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Email Preview</h3>
+            <button class="modal-close" onclick="closeEmailModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Subject</label>
+                <input type="text" id="emailSubject" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Body</label>
+                <textarea id="emailBody" class="form-control" rows="10"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeEmailModal()">Cancel</button>
+            <button class="btn btn-primary" id="sendEmailBtn">
+                <i class="fas fa-paper-plane"></i>
+                Send Email
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentLeadId = null;
+
+    function openEmailModal(leadId) {
+        currentLeadId = leadId;
+        document.getElementById('emailModal').classList.add('active');
+
+        // Fetch email preview
+        fetch(`/api/leads/${leadId}/email-preview`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('emailSubject').value = data.data.subject;
+                    document.getElementById('emailBody').value = data.data.body;
+                }
+            });
+    }
+
+    function closeEmailModal() {
+        document.getElementById('emailModal').classList.remove('active');
+        currentLeadId = null;
+    }
+
+    document.getElementById('sendEmailBtn').addEventListener('click', function () {
+        if (!currentLeadId) return;
+
+        fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lead_id: currentLeadId })
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Email sent successfully!');
+                    closeEmailModal();
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+    });
+</script>
+{% endblock %}

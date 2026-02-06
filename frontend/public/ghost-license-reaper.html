@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost License Reaper - Deja de Pagar por Software Fantasma</title>
+    <meta name="description"
+        content="Recupera los $41,000 anuales que pierdes en licencias SaaS zombies. Detectamos y eliminamos suscripciones abandonadas en 90 días o menos.">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --danger: #ef4444;
+            --success: #10b981;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --light: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* HERO SECTION */
+        #hero {
+            background: linear-gradient(135deg, var(--dark) 0%, #1e293b 100%);
+            color: white;
+            padding: 120px 0;
+            text-align: center;
+        }
+
+        #hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #hero h1 .highlight {
+            color: var(--danger);
+        }
+
+        #hero .subheadline {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border: 2px solid #475569;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            border-color: white;
+        }
+
+        .hero-stat {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid #334155;
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat-item {
+            text-align: center;
+        }
+
+        .hero-stat-item .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--success);
+        }
+
+        .hero-stat-item .label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* BENEFITS SECTION */
+        #benefits {
+            padding: 100px 0;
+            background: var(--light);
+        }
+
+        #benefits .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        #benefits .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        #benefits .section-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+        }
+
+        .benefit-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            border-left: 4px solid var(--danger);
+            transition: transform 0.2s;
+        }
+
+        .benefit-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .benefit-card .icon {
+            width: 56px;
+            height: 56px;
+            background: #fef2f2;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .benefit-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+
+        .benefit-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .benefit-card .stat {
+            display: inline-block;
+            background: #fef2f2;
+            color: var(--danger);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* SOCIAL PROOF */
+        #social-proof {
+            padding: 100px 0;
+            background: white;
+        }
+
+        .logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+            padding-bottom: 60px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .logo-item {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #94a3b8;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .logo-item:hover {
+            opacity: 1;
+        }
+
+        .testimonials {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .testimonial-card {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .testimonial-card .quote {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--dark);
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+
+        .testimonial-card .author {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .testimonial-card .avatar {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .testimonial-card .author-info h4 {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .testimonial-card .author-info span {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .metrics {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+
+        .metric-item .number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .metric-item .label {
+            color: var(--gray);
+        }
+
+        /* FAQ */
+        #faq {
+            padding: 100px 0;
+            background: var(--light);
+        }
+
+        #faq .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        #faq .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .faq-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        details {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+        }
+
+        summary {
+            padding: 24px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary::after {
+            content: "+";
+            font-size: 1.5rem;
+            color: var(--gray);
+            transition: transform 0.2s;
+        }
+
+        details[open] summary::after {
+            transform: rotate(45deg);
+        }
+
+        details p {
+            padding: 0 24px 24px;
+            color: var(--gray);
+            line-height: 1.7;
+        }
+
+        /* CTA FINAL */
+        #cta-final {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            text-align: center;
+            color: white;
+        }
+
+        #cta-final h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        #cta-final p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        #cta-final .btn-primary {
+            background: white;
+            color: var(--primary);
+        }
+
+        #cta-final .btn-primary:hover {
+            background: var(--light);
+        }
+
+        @media (max-width: 768px) {
+            .hero-stat {
+                gap: 30px;
+            }
+
+            .testimonials {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics {
+                gap: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+     HERO SECTION
+     ═══════════════════════════════════════════════════════════════════════════ -->
+    <section id="hero">
+        <div class="container">
+            <h1>
+                Tu empresa pierde <span class="highlight">$41,000 al año</span> en licencias SaaS que nadie usa
+            </h1>
+            <p class="subheadline">
+                El 37% de tus suscripciones de software están pagando por usuarios fantasma,
+                herramientas duplicadas y renovaciones automáticas olvidadas.
+                Ghost License Reaper las detecta y elimina en menos de 90 días.
+            </p>
+            <div class="cta-group">
+                <a href="#" class="btn-primary">
+                    🔍 Escanear Mi Stack SaaS Gratis
+                </a>
+                <a href="#" class="btn-secondary">
+                    Ver Demo en 3 minutos
+                </a>
+            </div>
+
+            <div class="hero-stat">
+                <div class="hero-stat-item">
+                    <div class="number">$41K</div>
+                    <div class="label">Ahorro promedio anual</div>
+                </div>
+                <div class="hero-stat-item">
+                    <div class="number">37%</div>
+                    <div class="label">Licencias zombies detectadas</div>
+                </div>
+                <div class="hero-stat-item">
+                    <div class="number">90 días</div>
+                    <div class="label">ROI garantizado</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+     BENEFITS SECTION (Loss Aversion Framework)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+    <section id="benefits">
+        <div class="container">
+            <div class="section-header">
+                <h2>Cada Mes Que Esperas, Pierdes Más</h2>
+                <p>Estas son las fugas de dinero que Ghost License Reaper detecta en las primeras 24 horas</p>
+            </div>
+
+            <div class="benefits-grid">
+                <!-- Benefit 1: Dinero perdido AHORA -->
+                <div class="benefit-card">
+                    <div class="icon">💸</div>
+                    <h3>Estás Pagando Sueldos a Empleados Fantasma</h3>
+                    <p>
+                        Licencias activas de personas que dejaron la empresa hace meses.
+                        Slack, Notion, Figma, GitHub... cada una sigue facturando $15-50/mes
+                        por usuario que ya no existe. Multiplica por 20 ex-empleados y 12 meses.
+                    </p>
+                    <span class="stat">Pérdida típica: $3,400/mes</span>
+                </div>
+
+                <!-- Benefit 2: Riesgo de seguridad -->
+                <div class="benefit-card">
+                    <div class="icon">🔓</div>
+                    <h3>Ex-Empleados Aún Tienen Acceso a Tus Datos</h3>
+                    <p>
+                        Cada licencia zombie es una puerta trasera abierta.
+                        Credenciales activas en tu CRM, código fuente, documentos financieros.
+                        Un data breach cuesta 10x más que todo tu stack SaaS junto.
+                    </p>
+                    <span class="stat">73% de empresas tienen accesos sin revocar</span>
+                </div>
+
+                <!-- Benefit 3: Tiempo desperdiciado -->
+                <div class="benefit-card">
+                    <div class="icon">⏰</div>
+                    <h3>Tu Equipo Pierde 40 Horas/Mes en Auditorías Manuales</h3>
+                    <p>
+                        Revisar facturas, cruzar con RRHH, pedir cancelaciones uno por uno...
+                        Trabajo tedioso que nadie quiere hacer y que se pospone eternamente.
+                        Mientras tanto, las renovaciones automáticas siguen pasando.
+                    </p>
+                    <span class="stat">Automatiza en 15 minutos lo que toma 2 semanas</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+     SOCIAL PROOF SECTION
+     ═══════════════════════════════════════════════════════════════════════════ -->
+    <section id="social-proof">
+        <div class="container">
+            <!-- Company Logos -->
+            <div class="logos">
+                <div class="logo-item">Stackflow</div>
+                <div class="logo-item">NeonLabs</div>
+                <div class="logo-item">DataPulse</div>
+                <div class="logo-item">CloudForge</div>
+                <div class="logo-item">Velocity.io</div>
+            </div>
+
+            <!-- Testimonials -->
+            <div class="testimonials">
+                <div class="testimonial-card">
+                    <p class="quote">
+                        "En el primer escaneo encontramos 47 licencias de Notion de gente que
+                        ya no trabajaba aquí. Eso eran $564 al mes que llevábamos pagando
+                        más de un año. Ghost License Reaper se pagó solo en la primera semana."
+                    </p>
+                    <div class="author">
+                        <div class="avatar">MR</div>
+                        <div class="author-info">
+                            <h4>María Rodríguez</h4>
+                            <span>CTO @ Stackflow (180 empleados)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="quote">
+                        "Lo peor no era el dinero, era el riesgo. Teníamos 12 ex-empleados
+                        con acceso a nuestro Salesforce. Ahora tenemos alertas automáticas
+                        cada vez que alguien deja la empresa. Cero esfuerzo manual."
+                    </p>
+                    <div class="author">
+                        <div class="avatar">JL</div>
+                        <div class="author-info">
+                            <h4>Javier López</h4>
+                            <span>VP Engineering @ NeonLabs (320 empleados)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aggregate Metrics -->
+            <div class="metrics">
+                <div class="metric-item">
+                    <div class="number">500+</div>
+                    <div class="label">Empresas protegidas</div>
+                </div>
+                <div class="metric-item">
+                    <div class="number">$12.4M</div>
+                    <div class="label">Recuperados para clientes</div>
+                </div>
+                <div class="metric-item">
+                    <div class="number">94%</div>
+                    <div class="label">Detectan zombies en el primer día</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+     FAQ SECTION (Handling CTO Objections)
+     ═══════════════════════════════════════════════════════════════════════════ -->
+    <section id="faq">
+        <div class="container">
+            <div class="section-header">
+                <h2>Preguntas de CTOs Escépticos</h2>
+                <p>(Las mismas que teníamos antes de construir esto)</p>
+            </div>
+
+            <div class="faq-list">
+                <!-- Objection 1: Integration complexity -->
+                <details>
+                    <summary>¿Cuánto tiempo toma configurar esto? No tengo ancho de banda.</summary>
+                    <p>
+                        15 minutos. Conectas vía OAuth con tus proveedores principales (Okta, Google Workspace,
+                        Azure AD), y Ghost License Reaper hace el resto. No hay agentes que instalar,
+                        no hay código que escribir. El primer escaneo completo termina en menos de 2 horas.
+                    </p>
+                </details>
+
+                <!-- Objection 2: Security concerns -->
+                <details>
+                    <summary>¿Qué permisos necesitan? No voy a dar acceso admin a un tercero.</summary>
+                    <p>
+                        Solo permisos de lectura. Vemos qué licencias existen y quién las tiene asignadas,
+                        pero no tocamos nada. Tú decides qué cancelar. Somos SOC 2 Type II compliant,
+                        y podemos firmar un DPA si lo necesitas. La mayoría de nuestros clientes son
+                        empresas con requisitos de compliance estrictos.
+                    </p>
+                </details>
+
+                <!-- Objection 3: ROI skepticism -->
+                <details>
+                    <summary>¿Cómo sé que realmente voy a ahorrar $41K? Suena demasiado bueno.</summary>
+                    <p>
+                        No lo sabrás hasta que escanees. Por eso el primer análisis es gratuito:
+                        te damos un reporte detallado de exactamente cuánto estás perdiendo en licencias
+                        zombies, con nombres de herramientas y usuarios específicos. Solo pagas si
+                        decides actuar. El 83% de empresas encuentra más de $2K/mes en pérdidas evitables.
+                    </p>
+                </details>
+
+                <!-- Objection 4: DIY comparison -->
+                <details>
+                    <summary>¿Por qué no puedo hacer esto con un spreadsheet y un intern?</summary>
+                    <p>
+                        Puedes. Toma unas 40 horas al mes si tienes 50+ herramientas SaaS. Y para cuando
+                        terminas la auditoría, ya hay 3 renovaciones nuevas que se te escaparon.
+                        Ghost License Reaper corre 24/7 y te alerta antes de cada renovación.
+                        El costo del intern es mayor que nuestra suscripción anual.
+                    </p>
+                </details>
+
+                <!-- Objection 5: Risk aversion -->
+                <details>
+                    <summary>¿Hay algún compromiso? ¿Qué pasa si no funciona para nosotros?</summary>
+                    <p>
+                        Prueba gratuita de 14 días con funcionalidad completa. Si en los primeros
+                        90 días no recuperas al menos 3x lo que pagas por Ghost License Reaper,
+                        te devolvemos el dinero. Sin preguntas. Llevamos 500+ empresas y solo
+                        2 han pedido reembolso (y fue porque se fusionaron con otra empresa).
+                    </p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════════
+     FINAL CTA SECTION
+     ═══════════════════════════════════════════════════════════════════════════ -->
+    <section id="cta-final">
+        <div class="container">
+            <h2>Deja de Pagar Por Software Fantasma</h2>
+            <p>El escaneo inicial es gratis. Descubre cuánto estás perdiendo en menos de 2 horas.</p>
+            <a href="#" class="btn-primary">
+                🔍 Escanear Mi Stack SaaS Ahora
+            </a>
+        </div>
+    </section>
+
+</body>
+
+</html>

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Verifying... | Ghost License Reaper</title>
+    <style>
+        :root {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(ellipse at top, #0f0f1a, #090909 70%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00E5FF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .error {
+            color: #FF6B6B;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h1>Verifying your login...</h1>
+        <p>Please wait while we authenticate you.</p>
+        <p id="error" class="error" style="display: none;"></p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = 'https://ykxomhorciutqsahqges.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreG9taG9yY2l1dHFzYWhxZ2VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzMjc5MjAsImV4cCI6MjA4NTkwMzkyMH0.C1ZDWua0YuiSHS0l3b_L1qvLWJeibvGkSZOcdsQJHJA';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function handleAuthCallback() {
+            try {
+                // Get the session from the URL hash (for OAuth) or query params (for Magic Link)
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) throw error;
+
+                if (session) {
+                    // Check if user needs onboarding
+                    // Redirect to onboarding page (it will handle redirection to dashboard if complete)
+                    window.location.href = '/onboarding.html';
+                } else {
+                    // No session, might be a magic link - wait for auth state change
+                    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+                        if (event === 'SIGNED_IN' && session) {
+                            subscription.unsubscribe();
+                            window.location.href = '/onboarding.html';
+                        }
+                    });
+
+                    // Timeout after 10 seconds
+                    setTimeout(() => {
+                        document.getElementById('error').textContent = 'Authentication timed out. Please try again.';
+                        document.getElementById('error').style.display = 'block';
+                    }, 10000);
+                }
+            } catch (error) {
+                document.getElementById('error').textContent = error.message;
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        handleAuthCallback();
+    </script>
+</body>
+
+</html>

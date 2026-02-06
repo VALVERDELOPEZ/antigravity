@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding | Ghost License Reaper</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="obsidian-theme">
+    <div id="app">
+        <div class="onboarding-container">
+            <!-- Header -->
+            <header class="onboarding-header">
+                <div class="logo">👻 <span>Ghost License Reaper</span></div>
+                <div class="stepper">
+                    <div class="step active" data-step="1">1</div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="2">2</div>
+                    <div class="step-line"></div>
+                    <div class="step" data-step="3">3</div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="onboarding-content">
+                <div id="onboarding-view">
+                    <!-- Views will be injected here by JS -->
+                    <div class="loading">🔄 Loading your profile...</div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="onboarding-footer">
+                <p>© 2026 Ghost License Reaper. Secure and Encrypted.</p>
+            </footer>
+        </div>
+    </div>
+    <script type="module" src="/src/onboarding-handler.js"></script>
+</body>
+
+</html>

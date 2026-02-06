@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - {{ plan|title }}{% endblock %}
+
+{% block body_class %}checkout-page{% endblock %}
+
+{% block body %}
+<div class="checkout-container">
+    <div class="checkout-card">
+        <a href="/" class="checkout-logo">
+            <i class="fas fa-bolt"></i>
+            <span>Lead Finder AI</span>
+        </a>
+
+        <h1>Upgrade to {{ plan|title }}</h1>
+
+        <div class="plan-summary">
+            <div class="plan-header">
+                <span class="plan-name">{{ plan|title }} Plan</span>
+                <span class="plan-price">€{{ plan_info.price }}/month</span>
+            </div>
+            <ul class="plan-features">
+                {% if plan == 'starter' %}
+                <li><i class="fas fa-check"></i> 100 leads/month</li>
+                <li><i class="fas fa-check"></i> Reddit, Twitter, HN</li>
+                <li><i class="fas fa-check"></i> 50 emails/month</li>
+                <li><i class="fas fa-check"></i> Auto-refresh every 8h</li>
+                {% elif plan == 'pro' %}
+                <li><i class="fas fa-check"></i> 500 leads/month</li>
+                <li><i class="fas fa-check"></i> All 6 platforms</li>
+                <li><i class="fas fa-check"></i> 250 emails/month</li>
+                <li><i class="fas fa-check"></i> Priority support</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div id="checkout-form">
+            <button id="checkout-button" class="btn btn-primary btn-lg btn-block">
+                <i class="fas fa-lock"></i>
+                Pay €{{ plan_info.price }} with Stripe
+            </button>
+        </div>
+
+        <p class="checkout-security">
+            <i class="fas fa-shield-alt"></i>
+            Secured by Stripe. Cancel anytime.
+        </p>
+
+        <a href="{{ url_for('public.pricing') }}" class="checkout-back">
+            <i class="fas fa-arrow-left"></i>
+            Back to pricing
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ stripe_key }}');
+
+    document.getElementById('checkout-button').addEventListener('click', async () => {
+        const btn = document.getElementById('checkout-button');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+        try {
+            const response = await fetch('/api/create-checkout-session', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ plan: '{{ plan }}' })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.data.sessionId) {
+                stripe.redirectToCheckout({ sessionId: data.data.sessionId });
+            } else {
+                alert('Error: ' + (data.message || 'Could not create checkout session'));
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-lock"></i> Pay €{{ plan_info.price }} with Stripe';
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-lock"></i> Pay €{{ plan_info.price }} with Stripe';
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Billing History{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block body %}
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-logo"><i class="fas fa-bolt"></i><span>Lead Finder AI</span></a>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="nav-item"><i
+                    class="fas fa-home"></i><span>Overview</span></a>
+            <a href="{{ url_for('dashboard.leads') }}" class="nav-item"><i
+                    class="fas fa-users"></i><span>Leads</span></a>
+            <a href="{{ url_for('dashboard.analytics') }}" class="nav-item"><i
+                    class="fas fa-chart-line"></i><span>Analytics</span></a>
+            <a href="{{ url_for('dashboard.settings') }}" class="nav-item"><i
+                    class="fas fa-cog"></i><span>Settings</span></a>
+        </nav>
+    </aside>
+
+    <main class="dashboard-main">
+        <header class="dashboard-header">
+            <h1>Billing History</h1>
+            <a href="{{ url_for('dashboard.settings') }}" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> Back
+                to
+                Settings</a>
+        </header>
+
+        <div class="dashboard-card">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Plan</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tx in transactions %}
+                    <tr>
+                        <td>{{ tx.created_at.strftime('%b %d, %Y') }}</td>
+                        <td>{{ tx.plan|title }}</td>
+                        <td>€{{ tx.amount }}</td>
+                        <td><span class="status-badge {{ tx.status }}">{{ tx.status|title }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="empty-state">No transactions yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}

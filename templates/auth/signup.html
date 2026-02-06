@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block body_class %}auth-page{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <a href="{{ url_for('public.landing') }}" class="auth-logo">
+                <i class="fas fa-bolt"></i>
+                <span>Lead Finder AI</span>
+            </a>
+            <h1>Create your account</h1>
+            <p>Start finding qualified leads in minutes</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="auth-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="John Doe" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="john@company.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Min. 8 characters" minlength="8"
+                    required>
+            </div>
+
+            <input type="hidden" name="plan" value="{{ request.args.get('plan', 'free') }}">
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+                <i class="fas fa-rocket"></i>
+                Create Account
+            </button>
+        </form>
+
+        {# Google OAuth - Hidden until implemented
+        <div class="auth-divider">
+            <span>or</span>
+        </div>
+
+        <button class="btn btn-google btn-block" type="button"
+            onclick="alert('Google Auth is coming soon! Please use email/password for now.')">
+            <i class="fab fa-google"></i>
+            Continue with Google
+        </button>
+        #}
+
+        <p class="auth-footer">
+            Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a>
+        </p>
+    </div>
+
+    <div class="auth-features">
+        <h2>What you get:</h2>
+        <ul>
+            <li><i class="fas fa-check"></i> AI-powered lead scraping</li>
+            <li><i class="fas fa-check"></i> Intelligent lead scoring</li>
+            <li><i class="fas fa-check"></i> Personalized email generation</li>
+            <li><i class="fas fa-check"></i> 14-day free trial</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

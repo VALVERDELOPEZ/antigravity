@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: ghost-license-reaper-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: ENABLE_SCHEDULER_THREAD
+        value: "true"
+      - key: ENABLE_AUTONOMOUS_OUTREACH
+        value: "true"
+      - key: DATABASE_URL
+        sync: false # Set this in Render Dashboard
+      - key: OPENAI_API_KEY
+        sync: false # Set this in Render Dashboard
+      - key: STRIPE_SECRET_KEY
+        sync: false # Set this in Render Dashboard
+      - key: ENCRYPTION_KEY
+        sync: false # Set this in Render Dashboard
+      - key: SMTP_USERNAME
+        sync: false # Set this in Render Dashboard
+      - key: SMTP_PASSWORD
+        sync: false # Set this in Render Dashboard

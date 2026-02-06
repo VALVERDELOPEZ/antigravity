@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Log In{% endblock %}
+
+{% block body_class %}auth-page{% endblock %}
+
+{% block body %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <a href="{{ url_for('public.landing') }}" class="auth-logo">
+                <i class="fas fa-bolt"></i>
+                <span>Lead Finder AI</span>
+            </a>
+            <h1>Welcome back</h1>
+            <p>Log in to your account</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="auth-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="john@company.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="remember" value="1">
+                    <span>Remember me</span>
+                </label>
+                <a href="{{ url_for('auth.forgot_password') }}" class="forgot-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg">
+                <i class="fas fa-sign-in-alt"></i>
+                Log In
+            </button>
+        </form>
+
+        {# Google OAuth - Hidden until implemented
+        <div class="auth-divider">
+            <span>or</span>
+        </div>
+
+        <button class="btn btn-google btn-block" type="button"
+            onclick="alert('Google Auth is coming soon! Please use email/password for now.')">
+            <i class="fab fa-google"></i>
+            Continue with Google
+        </button>
+        #}
+
+        <p class="auth-footer">
+            Don't have an account? <a href="{{ url_for('auth.signup') }}">Sign up free</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
