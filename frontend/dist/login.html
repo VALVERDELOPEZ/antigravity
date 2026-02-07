@@ -243,126 +243,139 @@
     <!-- Use a reliable CDNs and add error handling if it fails to load -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Check if supabase-js loaded
-        if (typeof supabase === 'undefined' || !window.supabase) {
-            document.getElementById('message').textContent = '⚠️ Error: Supabase library failed to load. Please check your ad blocker or internet connection.';
+        // Defensive coding: check if window.supabase exists
+        if (typeof window.supabase === 'undefined') {
+            document.getElementById('message').textContent = '⚠️ Error: Supabase library failed to load.';
             document.getElementById('message').className = 'message error';
             document.getElementById('message').style.display = 'block';
-            console.error('Supabase library not loaded. Check CDN link.');
+            console.error('CRITICAL: window.supabase is undefined. check CDN.');
         }
 
         // Initialize Supabase Configuration
         // CONFIRMED KEYS - DO NOT CHANGE WITHOUT VERIFICATION
-        const supabaseUrl = 'https://ykxomhorciutqsahqges.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreG9taG9yY2l1dHFzYWhxZ2VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzMjc5MjAsImV4cCI6MjA4NTkwMzkyMH0.C1ZDWua0YuiSHS0l3b_L1qvLWJeibvGkSZOcdsQJHJA';
+        // Use var to allow redeclaration if duplicate scripts exist (failsafe)
+        var MY_SUPABASE_URL = 'https://ykxomhorciutqsahqges.supabase.co';
+        var MY_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreG9taG9yY2l1dHFzYWhxZ2VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzMjc5MjAsImV4cCI6MjA4NTkwMzkyMH0.C1ZDWua0YuiSHS0l3b_L1qvLWJeibvGkSZOcdsQJHJA';
 
-        let client = null;
+        var mySupabaseClient = null;
         try {
-            // Renamed to avoid conflict with potential global 'supabase' var
-            const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
-            client = supabaseClient;
-            console.log('✅ Supabase Client Initialized (as supabaseClient)');
+            if (window.supabase && window.supabase.createClient) {
+                mySupabaseClient = window.supabase.createClient(MY_SUPABASE_URL, MY_SUPABASE_KEY);
+                console.log('✅ Supabase Client Initialized (as mySupabaseClient)');
+            }
         } catch (e) {
             console.error('❌ Failed to init Supabase:', e);
             alert('System Error: Could not connect to authentication server.');
         }
 
-        const messageEl = document.getElementById('message');
-        const magicLinkForm = document.getElementById('magicLinkForm');
-        const magicLinkBtn = document.getElementById('magicLinkBtn');
-        const googleBtn = document.getElementById('googleBtn');
+        // Element selection with error checking
+        var msgEl = document.getElementById('message');
+        var magicForm = document.getElementById('magicLinkForm');
+        var magicBtn = document.getElementById('magicLinkBtn');
+        var gBtn = document.getElementById('googleBtn');
 
-        function showMessage(text, type) {
-            messageEl.textContent = text;
-            messageEl.className = `message ${type}`;
-            messageEl.style.display = 'block';
+        function showStatusMsg(text, type) {
+            if (!msgEl) return;
+            msgEl.textContent = text;
+            msgEl.className = `message ${type}`;
+            msgEl.style.display = 'block';
         }
 
         // Magic Link Sign In
-        magicLinkForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
+        if (magicForm) {
+            magicForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                var emailInput = document.getElementById('email');
+                if (!emailInput) return;
+                var email = emailInput.value;
 
-            if (!client) return;
-
-            magicLinkBtn.classList.add('loading');
-            magicLinkBtn.textContent = 'Sending...';
-            showMessage('', ''); // Clear previous
-
-            try {
-                console.log('Attempting Magic Link for:', email);
-                const { data, error } = await client.auth.signInWithOtp({
-                    email,
-                    options: {
-                        emailRedirectTo: `${window.location.origin}/auth/callback`
-                    }
-                });
-
-                if (error) {
-                    console.error('Supabase Magic Link Error:', error);
-                    throw error;
+                if (!mySupabaseClient) {
+                    showStatusMsg('Error: Client not initialized', 'error');
+                    return;
                 }
 
-                console.log('Magic Link Success:', data);
-                showMessage('✅ Check your email! Magic link sent.', 'success');
-                magicLinkBtn.textContent = '📧 Email Sent!';
-            } catch (error) {
-                console.error(error);
-                let msg = error.message;
-                if (msg.includes('rate limit')) msg = 'Too many requests. Please wait a minute.';
-                showMessage(`❌ ${msg}`, 'error');
-                magicLinkBtn.textContent = '✨ Send Magic Link';
-            } finally {
-                magicLinkBtn.classList.remove('loading');
-            }
-        });
+                if (magicBtn) {
+                    magicBtn.classList.add('loading');
+                    magicBtn.textContent = 'Sending...';
+                }
+                showStatusMsg('', ''); // Clear previous
+
+                try {
+                    console.log('Attempting Magic Link for:', email);
+                    const { data, error } = await mySupabaseClient.auth.signInWithOtp({
+                        email: email,
+                        options: {
+                            emailRedirectTo: window.location.origin + '/auth/callback'
+                        }
+                    });
+
+                    if (error) {
+                        console.error('Supabase Magic Link Error:', error);
+                        throw error;
+                    }
+
+                    console.log('Magic Link Success:', data);
+                    showStatusMsg('✅ Check your email! Magic link sent.', 'success');
+                    if (magicBtn) magicBtn.textContent = '📧 Email Sent!';
+                } catch (error) {
+                    console.error(error);
+                    let msg = error.message;
+                    if (msg && msg.includes('rate limit')) msg = 'Too many requests. Please wait a minute.';
+                    showStatusMsg(`❌ ${msg}`, 'error');
+                    if (magicBtn) magicBtn.textContent = '✨ Send Magic Link';
+                } finally {
+                    if (magicBtn) magicBtn.classList.remove('loading');
+                }
+            });
+        }
 
         // Google Sign In
-        googleBtn.addEventListener('click', async () => {
-            if (!client) return;
-
-            googleBtn.classList.add('loading');
-            showMessage('🔄 Connecting to Google...', 'success');
-
-            try {
-                // Ensure we use the current origin for redirect
-                const redirectUrl = `${window.location.origin}/auth/callback`;
-                console.log('Initiating Google OAuth to:', redirectUrl);
-
-                const { data, error } = await client.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                        redirectTo: redirectUrl,
-                        queryParams: {
-                            access_type: 'offline',
-                            prompt: 'consent'
-                        }
-                    }
-                });
-
-                if (error) throw error;
-                // If successful, the page will redirect automatically
-
-            } catch (error) {
-                console.error('Google Login Error:', error);
-                showMessage(`❌ Google Login Failed: ${error.message}`, 'error');
-
-                // Detailed alert for common config issues
-                if (error.message.includes('redirect_uri_mismatch') || error.message.includes('not authorized')) {
-                    alert(`Setup Error: Google Cloud Configuration Mismatch.\n\nPlease ensure your Google Cloud Authorized Redirect URI is NOT: ${window.location.origin}/...\n\nIt MUST be your Supabase URL: ${supabaseUrl}/auth/v1/callback`);
-                } else {
-                    alert(`Login Failed: ${error.message}`);
+        if (gBtn) {
+            gBtn.addEventListener('click', async () => {
+                if (!mySupabaseClient) {
+                    showStatusMsg('Error: Client not initialized', 'error');
+                    return;
                 }
-                googleBtn.classList.remove('loading');
-            }
-        });
+
+                gBtn.classList.add('loading');
+                showStatusMsg('🔄 Connecting to Google...', 'success');
+
+                try {
+                    // Ensure we use the current origin for redirect
+                    var redirectUrl = window.location.origin + '/auth/callback';
+                    console.log('Initiating Google OAuth to:', redirectUrl);
+
+                    const { data, error } = await mySupabaseClient.auth.signInWithOAuth({
+                        provider: 'google',
+                        options: {
+                            redirectTo: redirectUrl,
+                            queryParams: {
+                                access_type: 'offline',
+                                prompt: 'consent'
+                            }
+                        }
+                    });
+
+                    if (error) throw error;
+
+                } catch (error) {
+                    console.error('Google Login Error:', error);
+                    showStatusMsg(`❌ Google Login Failed: ${error.message || 'Unknown error'}`, 'error');
+
+                    if (error.message && (error.message.includes('redirect_uri_mismatch') || error.message.includes('not authorized'))) {
+                        alert('Check Google Cloud Console Config');
+                    }
+                    gBtn.classList.remove('loading');
+                }
+            });
+        }
 
         // Check if already logged in
-        if (client) {
-            client.auth.getSession().then(({ data: { session } }) => {
-                if (session) {
+        if (mySupabaseClient) {
+            mySupabaseClient.auth.getSession().then(({ data }) => {
+                if (data && data.session) {
                     console.log('User already logged in, redirecting...');
-                    window.location.href = '/dashboard.html'; // Explicitly go to dashboard
+                    window.location.href = '/dashboard.html';
                 }
             });
         }
