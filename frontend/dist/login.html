@@ -258,8 +258,10 @@
 
         let client = null;
         try {
-            client = window.supabase.createClient(supabaseUrl, supabaseKey);
-            console.log('✅ Supabase Client Initialized');
+            // Renamed to avoid conflict with potential global 'supabase' var
+            const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+            client = supabaseClient;
+            console.log('✅ Supabase Client Initialized (as supabaseClient)');
         } catch (e) {
             console.error('❌ Failed to init Supabase:', e);
             alert('System Error: Could not connect to authentication server.');
