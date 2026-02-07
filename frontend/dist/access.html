@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ghost Access</title>
+
+    <!-- Fonts & Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            font-family: 'Inter', system-ui, sans-serif;
+            --accent-cyan: #00E5FF;
+            --accent-purple: #8B5CF6;
+            --bg-dark: #090909;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --color-success: #4ADE80;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: radial-gradient(ellipse at top, #0f0f1a, var(--bg-dark) 70%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-container {
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-google {
+            background: #fff;
+            color: #333;
+            margin-top: 1rem;
+        }
+
+        .btn-google:hover {
+            transform: translateY(-2px);
+        }
+
+        .message {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.9em;
+        }
+
+        .message.error {
+            background: rgba(255, 107, 107, 0.15);
+            color: #FF6B6B;
+            display: block;
+        }
+    </style>
+
+    <!-- Supabase Logic - MOVED TO HEAD WITH DEFER to avoid Injection Corruption -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM Loaded - Initializing Auth...');
+
+            var msgEl = document.getElementById('message');
+            var gBtn = document.getElementById('googleBtn');
+
+            function showError(text) {
+                if (msgEl) {
+                    msgEl.textContent = text;
+                    msgEl.className = 'message error';
+                    msgEl.style.display = 'block';
+                }
+                console.error(text);
+            }
+
+            if (typeof window.supabase === 'undefined') {
+                showError('⚠️ Supabase library failed to load (blocked?).');
+                return;
+            }
+
+            // Configuration
+            var URL = 'https://ykxomhorciutqsahqges.supabase.co';
+            var KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreG9taG9yY2l1dHFzYWhxZ2VzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzMjc5MjAsImV4cCI6MjA4NTkwMzkyMH0.C1ZDWua0YuiSHS0l3b_L1qvLWJeibvGkSZOcdsQJHJA';
+
+            var client = window.supabase.createClient(URL, KEY);
+            console.log('✅ Client Ready');
+
+            // Handle Login
+            if (gBtn) {
+                gBtn.addEventListener('click', async () => {
+                    console.log('Click!');
+                    gBtn.style.opacity = '0.5';
+                    gBtn.textContent = 'Connecting...';
+
+                    try {
+                        const { error } = await client.auth.signInWithOAuth({
+                            provider: 'google',
+                            options: {
+                                redirectTo: window.location.origin + '/auth/callback',
+                                queryParams: { access_type: 'offline', prompt: 'consent' }
+                            }
+                        });
+                        if (error) throw error;
+                    } catch (err) {
+                        showError('Login Failed: ' + err.message);
+                        gBtn.style.opacity = '1';
+                        gBtn.textContent = 'Try Again';
+                    }
+                });
+            }
+
+            // Auto-redirect if logged in
+            client.auth.getSession().then(({ data }) => {
+                if (data && data.session) {
+                    window.location.href = '/dashboard.html';
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="logo">👻</div>
+        <h1>Ghost Access</h1>
+        <p class="subtitle">Secure Entry</p>
+
+        <div class="card">
+            <div id="message" class="message"></div>
+            <button class="btn btn-google" id="googleBtn">
+                Continue with Google
+            </button>
+        </div>
+    </div>
+</body>
+
+</html>
